@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { modelInfo, TERMS } from '@/lib/glossary';
 import { EMOTION_COLORS, type IndexEntry } from '@/lib/types';
 
 type Entry = IndexEntry & { thumb: string; gold?: string };
@@ -52,10 +53,10 @@ export default function ClipGrid({ entries, models }: { entries: Entry[]; models
             <div className="meta">
               <div className="id" title={e.clip_id}>{e.dataset} · {e.clip_id}</div>
               <div className="chips">
-                {e.gold && <span className="chip gold" style={{ color: EMOTION_COLORS[e.gold] }}>human: {e.gold}</span>}
+                {e.gold && <span className="chip gold" style={{ color: EMOTION_COLORS[e.gold] }} title={TERMS.humanLabel}>human: {e.gold}</span>}
                 {models.map((m) => e.models[m] && (
                   <span key={m} className="chip" style={{ background: EMOTION_COLORS[e.models[m].label], opacity: m === model ? 1 : 0.55 }}
-                        title={m}>
+                        title={`${m}: ${modelInfo(m)}`}>
                     {m}: {e.models[m].label} {e.models[m].conf.toFixed(2)}
                   </span>
                 ))}

@@ -202,6 +202,9 @@ Then run only the new model and re-score:
 
 All models are mapped onto one label set: `neutral, happy, sad, surprised, fear, disgusted, angry, contempt`.
 
+Finally, add a one-paragraph plain-language description of the model to `web/lib/glossary.ts` — it's what
+people see when they hover over the model's name in the dashboard. (All other hover explanations live there too.)
+
 ---
 
 ## Change the emotion in a video (NED)

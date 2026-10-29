@@ -1,6 +1,8 @@
 'use client';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { modelInfo, TERMS } from '@/lib/glossary';
 import { EMOTION_COLORS, type Gold, type PredsDoc } from '@/lib/types';
+import Tip from '../../../Tip';
 
 type VideoWithRVFC = HTMLVideoElement & {
   requestVideoFrameCallback?: (cb: (now: number, meta: { mediaTime: number }) => void) => number;
@@ -101,29 +103,44 @@ export default function Player({ doc, video, gold }: { doc: PredsDoc; video: str
           <rect x={frame} y={0} width={Math.max(1, doc.n_frames / 300)} height={models.length * 12 + 4} fill="currentColor" />
         </svg>
         <div className="muted" style={{ fontSize: 12, display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-          {models.map((m) => <span key={m}>row {models.indexOf(m) + 1}: {m}</span>)}
-          <span>· click to seek · frame {frame + 1}/{doc.n_frames} @ {doc.fps} fps (assumed)</span>
+          <Tip text={TERMS.timeline}>Timeline</Tip>
+          {models.map((m) => <Tip key={m} text={modelInfo(m)}>row {models.indexOf(m) + 1}: {m}</Tip>)}
+          <span>· frame {frame + 1}/{doc.n_frames}</span>
+          <Tip text={TERMS.fps}>@ {doc.fps} fps (assumed)</Tip>
         </div>
       </div>
 
       <aside className="side">
         <div className="card">
-          <div className="muted" style={{ marginBottom: 6 }}>Overlay</div>
+          <div className="muted" style={{ marginBottom: 6 }}><Tip text={TERMS.overlay}>Overlay</Tip></div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
             {[...models, 'all'].map((m) => (
-              <button key={m} className={`ghost ${model === m ? 'on' : ''}`} onClick={() => setModel(m)}>{m}</button>
+              <Tip key={m} interactive side="right" text={m === 'all' ? TERMS.all : modelInfo(m)}>
+                <button className={`ghost ${model === m ? 'on' : ''}`} onClick={() => setModel(m)}>{m}</button>
+              </Tip>
             ))}
           </div>
         </div>
         {gold && (
           <div className="card">
-            <div className="muted">Human label</div>
-            <div style={{ fontWeight: 600, color: EMOTION_COLORS[gold.emotion] }}>{gold.emotion} <span className="muted">({gold.confidence})</span></div>
-            {gold.notes && <div className="muted" style={{ fontSize: 12 }}>{gold.notes}</div>}
+            <div className="muted"><Tip text={TERMS.humanLabel}>Human label</Tip></div>
+            <div style={{ fontWeight: 600, color: EMOTION_COLORS[gold.emotion] }}>
+              {gold.emotion}{' '}
+              {gold.confidence && (
+                <Tip side="right" text={TERMS.confidence[gold.confidence] ?? 'How sure the person labelling was.'}>
+                  <span className="muted">({gold.confidence})</span>
+                </Tip>
+              )}
+            </div>
+            {gold.notes && (
+              <div className="muted" style={{ fontSize: 12 }}><Tip side="right" text={TERMS.notes}>{gold.notes}</Tip></div>
+            )}
           </div>
         )}
         <div className="card">
-          <div className="muted" style={{ marginBottom: 6 }}>Frame {frame + 1} · {barModel}</div>
+          <div className="muted" style={{ marginBottom: 6 }}>
+            <Tip text={TERMS.frame}>Frame {frame + 1} · {barModel}</Tip>
+          </div>
           {probs ? (
             <div className="bars">
               {doc.labels.map((l, i) => (
@@ -137,16 +154,20 @@ export default function Player({ doc, video, gold }: { doc: PredsDoc; video: str
           ) : <div className="muted">No face in this frame.</div>}
         </div>
         <div className="card">
-          <div className="muted" style={{ marginBottom: 6 }}>Whole clip (mean over face frames)</div>
+          <div className="muted" style={{ marginBottom: 6 }}>
+            <Tip text={TERMS.wholeClip}>Whole clip (mean over face frames)</Tip>
+          </div>
           {models.map((m) => (
             <div key={m} className="bar" style={{ gridTemplateColumns: '1fr auto' }}>
-              <span>{m}</span>
+              <span><Tip text={modelInfo(m)}>{m}</Tip></span>
               <span className="chip" style={{ background: EMOTION_COLORS[doc.clip[m].label] }}>
                 {doc.clip[m].label} {doc.clip[m].conf.toFixed(2)}
               </span>
             </div>
           ))}
-          <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>Face visible in {(doc.face_frac * 100).toFixed(0)}% of frames</div>
+          <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>
+            <Tip text={TERMS.faceVisible}>Face visible in {(doc.face_frac * 100).toFixed(0)}% of frames</Tip>
+          </div>
         </div>
       </aside>
     </div>
