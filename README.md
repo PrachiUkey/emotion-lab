@@ -13,13 +13,20 @@ web/             Next.js dashboard (deploy on Vercel, root directory = web)
 ned/             NED emotion editing (MIT, Paraperas Papantoniou et al.) + torch-2 fixes + main.py
 ```
 
-## Setup
+## Setup (any Linux + NVIDIA GPU machine)
 
 ```bash
-cp .env.example .env            # fill in R2 keys — .env is gitignored, never commit it
-git config core.hooksPath .githooks   # pre-commit hook blocks env files, keys and >5 MB files
-pip install -r requirements.txt       # (python 3.10/3.11, CUDA GPU recommended)
+git clone https://github.com/PrachiUkey/emotion-lab.git && cd emotion-lab
+cp .env.example .env     # fill in R2 keys — .env is gitignored, never commit it
+./setup.sh               # envs + checkpoints + dashboard deps; safe to re-run
+./setup.sh --check       # verify an existing setup
 ```
+
+`setup.sh` builds two envs under `/venv` (or `~/envs`; override with `ENV_ROOT=`): `NED` (python 3.10,
+torch 2.4.1+cu121, pytorch3d compiled for the detected GPU) and `emotion-lab` (classifiers; reuses NED's
+torch). Checkpoints come from `r2:dump-bucket/emotions_ckpt` with sha256 checks
+(`configs/checkpoints_manifest.json`), falling back to public sources if R2 is unavailable. Needs ~25 GB
+disk and a driver with CUDA ≥ 12.1; Blackwell GPUs (compute capability ≥ 10) are not supported by this pin.
 
 Data comes from the R2 Lance datasets `fullbodydataset/{talkvid/lance,dataset_clip}/frames.lance`
 (one row per frame: JPEG + 68 landmarks; no audio, fps assumed 25). Face boxes come from those landmarks.
