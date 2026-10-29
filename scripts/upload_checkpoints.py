@@ -58,9 +58,16 @@ def main():
     missing = [str(p) for p, _, _ in items if not p.is_file()]
     if missing:
         sys.exit(f'!!! missing local files: {missing}')
+    ned_dir = Path(args.ned_dir).resolve()
     manifest = []
     for p, key, note in items:
-        manifest.append({'key': f'{r2.CKPT_PREFIX}/{key}', 'size': p.stat().st_size, 'sha256': sha256(p), 'note': note})
+        # where fetch_checkpoints.py restores it: repo-relative for NED files, ~-relative for model caches
+        p = p.resolve()
+        local = (f'ned/{p.relative_to(ned_dir)}' if p.is_relative_to(ned_dir)
+                 else f'~/{p.relative_to(Path.home())}')
+        # renderers fine-tuned here exist only in R2 (no public source), so a fresh setup may lack them
+        manifest.append({'key': f'{r2.CKPT_PREFIX}/{key}', 'path': local, 'size': p.stat().st_size,
+                         'sha256': sha256(p), 'required': not local.startswith('ned/runs/'), 'note': note})
         print(f"{manifest[-1]['size'] / 1e6:9.1f} MB  {manifest[-1]['key']}", flush=True)
     total = sum(m['size'] for m in manifest)
     print(f'{len(manifest)} files, {total / 1e9:.2f} GB')

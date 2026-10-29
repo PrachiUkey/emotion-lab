@@ -1,188 +1,274 @@
 [
  {
   "key": "emotions_ckpt/ned/manipulator/02_nets_finetuned.pth",
+  "path": "ned/manipulator_checkpoints/02_nets_finetuned.pth",
   "size": 59937674,
   "sha256": "acda831a18e472b4f292594e2fc12a08e6287da7e3cbac8de2bd766f6a1cec0d",
+  "required": true,
   "note": "NED manipulator (public, github.com/foivospar/NED)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/foxx/20_net_D.pth",
+  "path": "ned/checkpoints_foxx/20_net_D.pth",
   "size": 22219397,
   "sha256": "61cf6525b61075d6b44fc24ca0b00acdf3f0d2ac2f05812cf521210e79c9accc",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/foxx/20_net_Dm.pth",
+  "path": "ned/checkpoints_foxx/20_net_Dm.pth",
   "size": 22219397,
   "sha256": "173225fc35e78e8451d4c19bb417a2b34996d4a7d691b4edfbb7ac6bf4699982",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/foxx/20_net_G.pth",
+  "path": "ned/checkpoints_foxx/20_net_G.pth",
   "size": 283574364,
   "sha256": "da09a53af89ae44da7fdb111b746c57eabafc34cdfdda152a302909c6abad8a2",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/mcconaughey/20_net_D.pth",
+  "path": "ned/checkpoints_mcconaughey/20_net_D.pth",
   "size": 22219400,
   "sha256": "6bacaf3b70382eabebc34c88b587074b2d5712f36b872c678a7452a2deb90dd5",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/mcconaughey/20_net_Dm.pth",
+  "path": "ned/checkpoints_mcconaughey/20_net_Dm.pth",
   "size": 22219399,
   "sha256": "ea5fee1313b69125c3fcbdd186daf754a3b171018d3e8a9ae4ad147a28c0e9ca",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/mcconaughey/20_net_G.pth",
+  "path": "ned/checkpoints_mcconaughey/20_net_G.pth",
   "size": 283574364,
   "sha256": "74f5da0c0fad0592ea1ec7a90a4e77c0a517420fce3b72878f02f5d818a71c17",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/mcdormand/20_net_D.pth",
+  "path": "ned/checkpoints_mcdormand/20_net_D.pth",
   "size": 22219397,
   "sha256": "ffde409137a7cf5a6fb81a6f4693cb51d6368979204ffdfebeaf807f8ad3af0d",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/mcdormand/20_net_Dm.pth",
+  "path": "ned/checkpoints_mcdormand/20_net_Dm.pth",
   "size": 22219397,
   "sha256": "862f00bca66b5b39687bd08b18054f18b24906face5ef3739b3101c3a2b2bbf5",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/mcdormand/20_net_G.pth",
+  "path": "ned/checkpoints_mcdormand/20_net_G.pth",
   "size": 283574364,
   "sha256": "0d312a5bdb4c4f961107d6e4355fd703b4639d11f34e1297ed928ec2041e24cb",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/meta-renderer/15_net_D.pth",
+  "path": "ned/checkpoints_meta-renderer/15_net_D.pth",
   "size": 22219397,
   "sha256": "23e181cf1832f9ee45a1e3a812509824738454332a157ad79a9dd9c95f36bb81",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/meta-renderer/15_net_Dm.pth",
+  "path": "ned/checkpoints_meta-renderer/15_net_Dm.pth",
   "size": 22219397,
   "sha256": "570f8aa5b50ecdd0d3d809784dae28389484a5bde5808a4a61bed3705747b5d2",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/meta-renderer/15_net_G.pth",
+  "path": "ned/checkpoints_meta-renderer/15_net_G.pth",
   "size": 283574367,
   "sha256": "763970da99f62bc2fe1d73c4c4502eff8fcb4367c3494378323bec8e4b2c25cd",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/pacino/20_net_D.pth",
+  "path": "ned/checkpoints_pacino/20_net_D.pth",
   "size": 22219397,
   "sha256": "0b4b4c699c5b4d3cde0233b0e5cffa535e0b968f2425dcc80003fcd57d0e48a7",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/pacino/20_net_Dm.pth",
+  "path": "ned/checkpoints_pacino/20_net_Dm.pth",
   "size": 22219397,
   "sha256": "621f9ee2919be8b2d03fbe8d1dacf53bf91c461a57eedc4127d3528274adcf2e",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/pacino/20_net_G.pth",
+  "path": "ned/checkpoints_pacino/20_net_G.pth",
   "size": 283574364,
   "sha256": "da93d021dd18737434f70c07d1e596db8c2f2ef0d602ab1401e646a41e55df7f",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/roberts/20_net_D.pth",
+  "path": "ned/checkpoints_roberts/20_net_D.pth",
   "size": 22219397,
   "sha256": "77cb70b661776889dd8ff61eb1b57c873a917e5b1ff4c6d93a09bfb21fe8d1fd",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/roberts/20_net_Dm.pth",
+  "path": "ned/checkpoints_roberts/20_net_Dm.pth",
   "size": 22219397,
   "sha256": "c323b9695c6f4cd6f233bd948f794d598e170c387dfbe1fd27dc4654080e217a",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/roberts/20_net_G.pth",
+  "path": "ned/checkpoints_roberts/20_net_G.pth",
   "size": 283574364,
   "sha256": "ae0fa8affc4974e37e037007fea675bd477bb8a09fcf84dfdae6a5aa282690fe",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/tarantino/20_net_D.pth",
+  "path": "ned/checkpoints_tarantino/20_net_D.pth",
   "size": 22219397,
   "sha256": "91d86293a1a7cb67cd05d4c136a393102ff9b97ddaa179d56213ccfea8dfdac5",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/tarantino/20_net_Dm.pth",
+  "path": "ned/checkpoints_tarantino/20_net_Dm.pth",
   "size": 22219397,
   "sha256": "a25577c7d2bf3d7610bbf62de8d9e3c5aeae1605dd7ed78355871c17db3b7865",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/tarantino/20_net_G.pth",
+  "path": "ned/checkpoints_tarantino/20_net_G.pth",
   "size": 283574364,
   "sha256": "ee10a3a5b9c4b0f3e8a6a3f40942aa4e8c90e2f6cb9a766935655df8fbef1760",
+  "required": true,
   "note": "NED renderer (public)"
  },
  {
   "key": "emotions_ckpt/ned/renderers/obama/10_net_D.pth",
+  "path": "ned/runs/obama/renderer/10_net_D.pth",
   "size": 22218958,
   "sha256": "a99324008709b49662ee0288dd7558d06c44ac2742bf2fa043cd700c6624e136",
+  "required": false,
   "note": "NED renderer fine-tuned here"
  },
  {
   "key": "emotions_ckpt/ned/renderers/obama/10_net_Dm.pth",
+  "path": "ned/runs/obama/renderer/10_net_Dm.pth",
   "size": 22219000,
   "sha256": "d342c6529b0f05f82a6db53b1b05aeaa8b2578ea410bebe485ebd1f6f330d482",
+  "required": false,
   "note": "NED renderer fine-tuned here"
  },
  {
   "key": "emotions_ckpt/ned/renderers/obama/10_net_G.pth",
+  "path": "ned/runs/obama/renderer/10_net_G.pth",
   "size": 283567729,
   "sha256": "3b94bb4d2d7b433d2af197cd4a1ba46ed5a91456368417d5b64356e790f4f9ab",
+  "required": false,
+  "note": "NED renderer fine-tuned here"
+ },
+ {
+  "key": "emotions_ckpt/ned/renderers/obama/20_net_D.pth",
+  "path": "ned/runs/obama/renderer/20_net_D.pth",
+  "size": 22218958,
+  "sha256": "303e66840ab1de8aee737c3b2740869150f64f5c748c7acaf4a858ee0e5b19f4",
+  "required": false,
+  "note": "NED renderer fine-tuned here"
+ },
+ {
+  "key": "emotions_ckpt/ned/renderers/obama/20_net_Dm.pth",
+  "path": "ned/runs/obama/renderer/20_net_Dm.pth",
+  "size": 22219000,
+  "sha256": "463d08155bcdaef082fdb046bedf81c4eefb9008d0c00b63e437cc8afc28f827",
+  "required": false,
+  "note": "NED renderer fine-tuned here"
+ },
+ {
+  "key": "emotions_ckpt/ned/renderers/obama/20_net_G.pth",
+  "path": "ned/runs/obama/renderer/20_net_G.pth",
+  "size": 283567729,
+  "sha256": "ad69890dac90247117ca8992b1c6e76d2ad8dfe53dd02a69be93e005c8a5fc05",
+  "required": false,
   "note": "NED renderer fine-tuned here"
  },
  {
   "key": "emotions_ckpt/ned/deca/deca_model.tar",
+  "path": "ned/DECA/data/deca_model.tar",
   "size": 434142943,
   "sha256": "e714ed293054cba5eea9c96bd3b6b57880074cd84b3fd00d606cbaf0bee7c5c2",
+  "required": true,
   "note": "DECA (public)"
  },
  {
   "key": "emotions_ckpt/ned/deca/generic_model.pkl",
+  "path": "ned/DECA/data/generic_model.pkl",
   "size": 53023716,
   "sha256": "efcd14cc4a69f3a3d9af8ded80146b5b6b50df3bd74cf69108213b144eba725b",
+  "required": true,
   "note": "FLAME 2020, licence-gated upstream (FLAME/BFM/FSGAN terms apply); private bucket only"
  },
  {
   "key": "emotions_ckpt/ned/deca/FLAME_albedo_from_BFM.npz",
+  "path": "ned/DECA/data/FLAME_albedo_from_BFM.npz",
   "size": 1258291694,
   "sha256": "07cefceafab36150b458f138dd9fc001488454be889fa78ce08df5de7f5753b4",
+  "required": true,
   "note": "BFM albedo, licence-gated upstream (FLAME/BFM/FSGAN terms apply); private bucket only"
  },
  {
   "key": "emotions_ckpt/ned/segmentation/lfw_figaro_unet_256_2_0_segmentation_v1.pth",
+  "path": "ned/preprocessing/segmentation/lfw_figaro_unet_256_2_0_segmentation_v1.pth",
   "size": 115854976,
   "sha256": "6979578db602046552833cf882afe23047b6c771f3eb2df3e36588de6c1aa643",
+  "required": true,
   "note": "FSGAN segmenter, licence-gated upstream (FLAME/BFM/FSGAN terms apply); private bucket only"
  },
  {
   "key": "emotions_ckpt/classifiers/hsemotion/enet_b0_8_best_vgaf.onnx",
+  "path": "~/.hsemotion/enet_b0_8_best_vgaf.onnx",
   "size": 16039595,
   "sha256": "fa07e841fd06c7a67ee651ea4e6e4a3a2bb5695f47b37a7da50492526f59c898",
+  "required": true,
   "note": "HSEmotion (Apache-2.0)"
  },
  {
   "key": "emotions_ckpt/classifiers/hsemotion/enet_b2_8.onnx",
+  "path": "~/.hsemotion/enet_b2_8.onnx",
   "size": 30779724,
   "sha256": "180a9d4845b59393de4511598a0d1d34b705034691ea32959ce5009db7cf52b7",
+  "required": true,
   "note": "HSEmotion (Apache-2.0)"
  }
 ]
