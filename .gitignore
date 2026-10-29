@@ -1,0 +1,50 @@
+# --- secrets: never commit keys or env files ---
+.env
+.env.*
+*.env
+!.env.example
+web/.env*
+!web/.env.example
+*.conf
+rclone.conf
+*.pem
+*.key
+
+# --- model weights / checkpoints (live in r2:dump-bucket/emotions_ckpt) ---
+checkpoints*/
+manipulator_checkpoints/
+*.pth
+*.pt
+*.ckpt
+*.tar
+*.onnx
+*.npz
+*.safetensors
+ned/DECA/data/generic_model.pkl
+
+# --- generated data ---
+ned/runs/
+runs/
+outputs/
+data_cache/
+*.mp4
+*.webm
+*.lance/
+
+# --- python ---
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.ipynb_checkpoints/
+
+# --- web ---
+web/node_modules/
+web/.next/
+web/out/
+.vercel/
+
+# --- os/editor ---
+.DS_Store
+.vscode/
+.idea/

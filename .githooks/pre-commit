@@ -1,0 +1,31 @@
+#!/bin/bash
+# Block secrets and large binaries from being committed.
+# Enabled with: git config core.hooksPath .githooks
+fail=0
+
+# Secret-like file names, on anything added/copied/modified/renamed.
+while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    case "$(basename "$f")" in
+        .env.example) ;;
+        .env|.env.*|*.env|*.conf|*.pem|*.key)
+            echo "pre-commit: refusing to commit secret-like file: $f" >&2; fail=1 ;;
+    esac
+done < <(git diff --cached --name-only --diff-filter=ACMR)
+
+# Size limit on new/changed content (pure renames of existing files are fine).
+while IFS= read -r f; do
+    [ -f "$f" ] || continue
+    size=$(wc -c < "$f")
+    if [ "$size" -gt 5242880 ]; then
+        echo "pre-commit: $f is $((size / 1048576)) MB (>5 MB); weights belong in R2, not git" >&2; fail=1
+    fi
+done < <(git diff --cached --name-only --diff-filter=AM)
+
+# Key material: long values assigned to key/secret/token-like names in added lines.
+if git diff --cached -U0 --diff-filter=ACMR -- . ':!.env.example' ':!.githooks/pre-commit' |
+    grep -E '^\+' | grep -iE '(key|secret|token|password)[a-z_]*["'"'"']?\s*[:=]\s*["'"'"']?[A-Za-z0-9+/_-]{32,}' >/dev/null; then
+    echo "pre-commit: staged changes look like they contain a key/secret value" >&2; fail=1
+fi
+
+[ "$fail" -eq 0 ] || { echo "pre-commit: commit blocked" >&2; exit 1; }

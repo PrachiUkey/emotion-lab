@@ -132,7 +132,8 @@ class UnetUp(nn.Module):
 
     def forward(self, inputs1, inputs2):
         outputs2 = self.up(inputs2)
-        outputs2 = self.conv1d(outputs2,)
+        # Conv1d with a (1,1) kernel holds 4D weights; torch<1.8 ran it as conv2d, newer torch rejects 4D input
+        outputs2 = F.conv2d(outputs2, self.conv1d.weight, self.conv1d.bias)
         offset = outputs2.size()[2] - inputs1.size()[2]
         padding = 2 * [offset // 2, offset // 2]
         outputs1 = F.pad(inputs1, padding)

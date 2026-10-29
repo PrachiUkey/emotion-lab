@@ -60,7 +60,7 @@ def smooth_boxes(boxes, previous_box, args):
             boxes[i] = next((item for item in boxes[i+1:] if item is not None), boxes[i-1])
     boxes = [box[0] for box in boxes]   # if more than one faces detected, keep the one with the heighest probability
     # Smoothen boxes
-    old_boxes = np.array(boxes)
+    old_boxes = np.array([np.asarray(box, dtype=np.float64) for box in boxes])
     window_length = min(args.window_length, old_boxes.shape[0])
     if window_length % 2 == 0:
         window_length -= 1

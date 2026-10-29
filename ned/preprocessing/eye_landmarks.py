@@ -231,7 +231,7 @@ def main():
     # Print Arguments
     print_args(parser, args)
 
-    predictor = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, device=device, face_detector='sfd')
+    predictor = face_alignment.FaceAlignment(face_alignment.LandmarksType.TWO_D, device=device, face_detector='sfd')
     template = np.loadtxt('preprocessing/files/template.gz') if args.align else None    # template 68 landmarks (for face alignment)
 
     # Get the path of each image.
