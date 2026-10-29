@@ -1,0 +1,14 @@
+# emotion_lab (classification / evaluation). NED editing has its own env: ned/setup_env.sh
+--extra-index-url https://download.pytorch.org/whl/cu121
+torch==2.4.1
+transformers==4.46.3
+onnxruntime-gpu>=1.19
+hsemotion-onnx>=0.3
+pylance>=0.20
+pyarrow>=17
+boto3>=1.35
+opencv-python-headless>=4.10
+numpy<2
+scikit-learn>=1.5
+pyyaml>=6
+tqdm

@@ -1,0 +1,19 @@
+# Emotion classifiers under comparison. Each predicts per frame on a face crop.
+# kind: hsemotion -> ONNX AffectNet models (variant = HSEmotion model name)
+#       hf_image  -> Hugging Face image-classification repo with emotion labels
+models:
+  hsemotion_b0:
+    kind: hsemotion
+    variant: enet_b0_8_best_vgaf
+    trained_on: AffectNet (8 classes), fine-tuned on VGAF
+    license: Apache-2.0
+  hsemotion_b2:
+    kind: hsemotion
+    variant: enet_b2_8
+    trained_on: AffectNet (8 classes)
+    license: Apache-2.0
+  vit_fer:
+    kind: hf_image
+    repo: trpakov/vit-face-expression
+    trained_on: FER2013 (7 classes, 48x48 grayscale faces)
+    license: see model card

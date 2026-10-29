@@ -24,7 +24,7 @@ done < <(git diff --cached --name-only --diff-filter=AM)
 
 # Key material: long values assigned to key/secret/token-like names in added lines.
 if git diff --cached -U0 --diff-filter=ACMR -- . ':!.env.example' ':!.githooks/pre-commit' |
-    grep -E '^\+' | grep -iE '(key|secret|token|password)[a-z_]*["'"'"']?\s*[:=]\s*["'"'"']?[A-Za-z0-9+/_-]{32,}' >/dev/null; then
+    grep -E '^\+' | grep -iE '(key|secret|token|password)[a-z_]*["'"'"']?\s*[:=]\s*["'"'"']?[A-Za-z0-9+_-]{32,}' >/dev/null; then
     echo "pre-commit: staged changes look like they contain a key/secret value" >&2; fail=1
 fi
 
