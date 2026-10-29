@@ -10,7 +10,7 @@
 #   NED          python 3.10, torch 2.4.1+cu121, pytorch3d (built for this GPU) -> ned/ editing pipeline
 #   emotion-lab  classifiers/eval; inherits NED's torch via --system-site-packages (saves ~5 GB)
 # Needs: git, curl, bzip2, unzip, an NVIDIA driver supporting CUDA >= 12.1, ~25 GB free disk.
-# R2 checkpoint download needs .env (copy .env.example) with keys that can read dump-bucket.
+# R2 checkpoint download needs .env with keys that can read dump-bucket (format: README "Credentials").
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -183,7 +183,7 @@ verify() {
     if [ "$SKIP_WEB" = 0 ]; then
         if [ -d web/node_modules/next ]; then echo "ok   web deps installed"; else warn "web/node_modules missing"; fail=1; fi
     fi
-    [ -f .env ] && echo "ok   .env present (gitignored)" || warn ".env missing: cp .env.example .env and fill in R2 keys"
+    [ -f .env ] && echo "ok   .env present (gitignored)" || warn ".env missing: create it with your R2 keys (README, \"Credentials\")"
     [ "$(git config core.hooksPath || true)" = .githooks ] && echo "ok   pre-commit secret guard enabled" \
         || { warn "git hooks not enabled"; fail=1; }
     [ "$fail" = 0 ] || die "verification failed (see warnings above)"
@@ -198,7 +198,7 @@ EOF
 
 # ---------------------------------------------------------------- main
 git config core.hooksPath .githooks
-[ -f .env ] || { [ -n "${R2_ACCESS_KEY_ID:-}" ] || warn ".env not found: copy .env.example to .env and add R2 keys (needed for R2 data/checkpoints)"; }
+[ -f .env ] || { [ -n "${R2_ACCESS_KEY_ID:-}" ] || warn ".env not found: create it with your R2 keys, see README \"Credentials\" (needed for R2 data/checkpoints)"; }
 
 if [ "$CHECK_ONLY" = 1 ]; then verify; exit 0; fi
 

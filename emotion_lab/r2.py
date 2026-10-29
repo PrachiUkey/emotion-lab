@@ -19,11 +19,11 @@ def credentials():
     path = Path(os.environ.get('EMOTION_LAB_ENV', REPO / '.env'))
     if not path.is_file():
         raise RuntimeError(f'No R2 credentials: set R2_ENDPOINT/R2_ACCESS_KEY_ID/R2_SECRET_ACCESS_KEY or create {path} '
-                           f'(see .env.example)')
+                           f'(see README, "Credentials")')
     text = path.read_text()
     start = text.find('[r2]')
     if start < 0:
-        raise RuntimeError(f'{path} has no [r2] section (see .env.example)')
+        raise RuntimeError(f'{path} has no [r2] section (see README, "Credentials")')
     cp = configparser.ConfigParser()
     cp.read_string(text[start:])
     sec = cp['r2']
