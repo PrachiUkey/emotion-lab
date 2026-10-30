@@ -12,3 +12,9 @@ numpy<2
 scikit-learn>=1.5
 pyyaml>=6
 tqdm
+# C-MET's classifiers (face alignment like Emotion-FAN) and the speech model
+dlib-bin>=19.24
+gdown>=5
+torchaudio==2.4.1
+funasr>=1.1
+soundfile>=0.12

@@ -270,5 +270,29 @@
   "sha256": "180a9d4845b59393de4511598a0d1d34b705034691ea32959ce5009db7cf52b7",
   "required": true,
   "note": "HSEmotion (Apache-2.0)"
+ },
+ {
+  "key": "emotions_ckpt/classifiers/cmet/Emotion-FAN_CREMA_D.pth",
+  "path": "~/.cache/emotion-lab/cmet/Emotion-FAN_CREMA_D.pth",
+  "size": 44801364,
+  "sha256": "f6fd847ad29d9b2bcc34117db54ee2dd897825963fa33295c543370e0d687ec6",
+  "required": true,
+  "note": "C-MET's emotion classifier (github.com/ChanHyeok-Choi/C-MET, Apache-2.0)"
+ },
+ {
+  "key": "emotions_ckpt/classifiers/cmet/Emotion-FAN_MEAD.pth",
+  "path": "~/.cache/emotion-lab/cmet/Emotion-FAN_MEAD.pth",
+  "size": 44805460,
+  "sha256": "e3ea6d1d451cd2a56c4a85fa7abc1626d58d87a8cdc603689ef55087c61f7ce7",
+  "required": true,
+  "note": "C-MET's emotion classifier (github.com/ChanHyeok-Choi/C-MET, Apache-2.0)"
+ },
+ {
+  "key": "emotions_ckpt/classifiers/cmet/shape_predictor_5_face_landmarks.dat",
+  "path": "~/.cache/emotion-lab/cmet/shape_predictor_5_face_landmarks.dat",
+  "size": 9150489,
+  "sha256": "c4b1e9804792707d3a405c2c16a80a20269e6675021f64a41d30fffafbc41888",
+  "required": true,
+  "note": "dlib 5-point face predictor (dlib.net)"
  }
 ]

@@ -10,7 +10,7 @@ CANONICAL = ['neutral', 'happy', 'sad', 'surprised', 'fear', 'disgusted', 'angry
 # Model-specific class names -> canonical
 ALIASES = {
     'neutral': 'neutral', 'happiness': 'happy', 'happy': 'happy', 'sadness': 'sad', 'sad': 'sad',
-    'surprise': 'surprised', 'surprised': 'surprised', 'fear': 'fear', 'disgust': 'disgusted',
+    'surprise': 'surprised', 'surprised': 'surprised', 'fear': 'fear', 'fearful': 'fear', 'disgust': 'disgusted',
     'disgusted': 'disgusted', 'anger': 'angry', 'angry': 'angry', 'contempt': 'contempt',
 }
 

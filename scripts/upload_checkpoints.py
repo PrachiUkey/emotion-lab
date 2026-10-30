@@ -37,6 +37,12 @@ def plan(ned_dir):
     add(ned_dir / 'preprocessing/segmentation' / seg, f'ned/segmentation/{seg}', 'FSGAN segmenter, ' + GATED)
     for p in sorted((Path.home() / '.hsemotion').glob('*.onnx')):
         add(p, f'classifiers/hsemotion/{p.name}', 'HSEmotion (Apache-2.0)')
+    cmet = Path.home() / '.cache' / 'emotion-lab' / 'cmet'
+    for p in sorted(cmet.glob('Emotion-FAN_*.pth')):
+        add(p, f'classifiers/cmet/{p.name}', "C-MET's emotion classifier (github.com/ChanHyeok-Choi/C-MET, Apache-2.0)")
+    if (cmet / 'shape_predictor_5_face_landmarks.dat').is_file():
+        add(cmet / 'shape_predictor_5_face_landmarks.dat', 'classifiers/cmet/shape_predictor_5_face_landmarks.dat',
+            'dlib 5-point face predictor (dlib.net)')
     return out
 
 

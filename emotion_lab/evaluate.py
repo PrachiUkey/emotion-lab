@@ -64,8 +64,16 @@ def evaluate(gold, preds, models, n_boot=1000, seed=0):
         f1_boot = [f1_score(y[b], pred[b], labels=present, average='macro', zero_division=0) for b in boots]
         neutral = CANONICAL.index('neutral')
         is_neutral = y == neutral
+        # Fair score for models that cannot say "neutral" (e.g. C-MET's classifiers): only human-emotional clips
+        emo = ~is_neutral
+        emo_present = sorted(set(y[emo].tolist()))
+        f1_emo = (f1_score(y[emo], pred[emo], labels=emo_present, average='macro', zero_division=0)
+                  if emo.any() else None)
+        metas = [preds[k].get('model_meta', {}).get(name) for k in keys] if name != 'ensemble_mean' else []
+        classes = next((m['classes'] for m in metas if m), None) if metas else None
         rows.append({
-            'model': name, 'n': len(keys),
+            'model': name, 'n': len(keys), 'n_non_neutral': int(emo.sum()), 'classes': classes,
+            'macro_f1_non_neutral': None if f1_emo is None else round(float(f1_emo), 4),
             'macro_f1': round(float(f1), 4),
             'macro_f1_ci95': [round(float(np.percentile(f1_boot, 2.5)), 4), round(float(np.percentile(f1_boot, 97.5)), 4)],
             'accuracy': round(float((pred == y).mean()), 4),

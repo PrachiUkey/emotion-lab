@@ -79,3 +79,10 @@ th { font-weight: 600; color: var(--muted); font-size: 12px; }
     position: fixed; left: 16px; right: 16px; bottom: 16px; top: auto; width: auto; max-width: none;
   }
 }
+
+/* model badges, captions, unsupported classes */
+.badge { font-size: 10px; padding: 1px 5px; margin-left: 5px; border-radius: 999px; background: var(--line); color: var(--muted); vertical-align: middle; }
+.badge.warn { background: rgba(239,107,94,.18); color: var(--bad); }
+.caption { margin-top: 8px; padding: 6px 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; font-size: 14px; min-height: 34px; }
+.caption .now { background: var(--accent); color: #fff; border-radius: 4px; padding: 0 3px; }
+.bar.off { opacity: .55; }

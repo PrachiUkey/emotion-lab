@@ -51,7 +51,10 @@ export default function ClipGrid({ entries, models }: { entries: Entry[]; models
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={e.thumb} alt="" loading="lazy" />
             <div className="meta">
-              <div className="id" title={e.clip_id}>{e.dataset} · {e.clip_id}</div>
+              <div className="id" title={e.clip_id}>
+                {e.has_audio && <span className="badge" style={{ marginLeft: 0, marginRight: 5 }} title="This clip has sound; voice models listen to it">audio</span>}
+                {e.dataset} · {e.clip_id}
+              </div>
               <div className="chips">
                 {e.gold && <span className="chip gold" style={{ color: EMOTION_COLORS[e.gold] }} title={TERMS.humanLabel}>human: {e.gold}</span>}
                 {models.map((m) => e.models[m] && (

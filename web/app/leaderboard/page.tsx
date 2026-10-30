@@ -19,12 +19,14 @@ export default async function LeaderboardPage() {
       <div className="note">
         Ranked by macro-F1 (each emotion counts equally — the data is mostly neutral, so accuracy alone flatters
         models that guess neutral). <b>Neutral FP</b> = share of human-neutral clips the model called emotional;
-        talking faces trigger this. With this few labels the confidence intervals are wide — treat close scores as ties.
+        talking faces trigger this. <b>Macro-F1 non-neutral</b> scores only the clips a human called emotional — the
+        fair comparison for models marked &ldquo;no neutral&rdquo; (C-MET&apos;s classifiers can never answer neutral, so
+        they lose every neutral clip). With this few labels the confidence intervals are wide — treat close scores as ties.
       </div>
       <div className="table-wrap">
         <table>
           <thead><tr>
-            <th>Model</th><th>Macro-F1</th><th>95% CI</th><th>Accuracy</th><th>Neutral FP</th><th>ECE</th><th>Frame flip rate</th>
+            <th>Model</th><th>Macro-F1</th><th>95% CI</th><th>Macro-F1 non-neutral</th><th>Accuracy</th><th>Neutral FP</th><th>ECE</th><th>Frame flip rate</th>
             {present.map((k) => <th key={k}>recall {k}</th>)}
           </tr></thead>
           <tbody>
@@ -33,6 +35,8 @@ export default async function LeaderboardPage() {
                 <td><b>{r.model}</b></td>
                 <td>{r.macro_f1.toFixed(3)}</td>
                 <td className="muted">{r.macro_f1_ci95[0].toFixed(2)}–{r.macro_f1_ci95[1].toFixed(2)}</td>
+                <td>{r.macro_f1_non_neutral == null ? '—' : r.macro_f1_non_neutral.toFixed(3)}
+                  {r.classes && !r.classes.includes('neutral') && <span className="badge warn">no neutral</span>}</td>
                 <td>{pct(r.accuracy)}</td>
                 <td>{pct(r.neutral_fp_rate)}</td>
                 <td>{r.ece.toFixed(3)}</td>

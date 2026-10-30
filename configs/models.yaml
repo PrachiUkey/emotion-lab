@@ -1,6 +1,8 @@
-# Emotion classifiers under comparison. Each predicts per frame on a face crop.
-# kind: hsemotion -> ONNX AffectNet models (variant = HSEmotion model name)
-#       hf_image  -> Hugging Face image-classification repo with emotion labels
+# Emotion classifiers under comparison. Each predicts per frame.
+# kind: hsemotion      -> ONNX AffectNet models (variant = HSEmotion model name)
+#       hf_image       -> Hugging Face image-classification repo with emotion labels
+#       cmet_fan       -> C-MET's evaluation classifier (ResNet18; checkpoint in ~/.cache/emotion-lab/cmet)
+#       dataset_column -> scores that ship with a dataset (only runs on `datasets`)
 models:
   hsemotion_b0:
     kind: hsemotion
@@ -16,4 +18,31 @@ models:
     kind: hf_image
     repo: trpakov/vit-face-expression
     trained_on: FER2013 (7 classes, 48x48 grayscale faces)
+    license: see model card
+  cmet_mead:
+    kind: cmet_fan
+    variant: mead
+    checkpoint: Emotion-FAN_MEAD.pth
+    trained_on: FER+ then MEAD (7 classes, no neutral) - C-MET (CVPR 2026) evaluation classifier
+    license: Apache-2.0 (C-MET)
+  cmet_crema:
+    kind: cmet_fan
+    variant: crema_d
+    checkpoint: Emotion-FAN_CREMA_D.pth
+    trained_on: FER+ then CREMA-D (5 classes, no neutral/surprise/contempt) - C-MET evaluation classifier
+    license: Apache-2.0 (C-MET)
+  seamless_imitator:
+    kind: dataset_column
+    column: emotion_scores
+    # Meta lists the 8 classes alphabetically. Order verified 2026-10-30: on 835 frames from 10 seamless clips each
+    # index correlated best with the same hsemotion_b0 class (8/8; e.g. Happiness r=0.92, Neutral r=0.79).
+    labels: [Anger, Contempt, Disgust, Fear, Happiness, Neutral, Sadness, Surprise]
+    datasets: [seamless]
+    trained_on: Meta's Imitator model (precomputed in the Seamless Interaction dataset)
+  speech_emotion2vec:
+    kind: audio_emotion2vec
+    repo: emotion2vec/emotion2vec_plus_large
+    window: 2.0   # seconds of speech scored at a time
+    hop: 0.5
+    trained_on: emotion2vec+ large - speech emotion from audio (the encoder C-MET uses); 7 emotions, no contempt
     license: see model card

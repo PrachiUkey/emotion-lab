@@ -71,7 +71,7 @@ assert torch.cuda.is_available()
 EOF
 }
 lab_ok() { [ -x "$LAB_ENV/bin/python" ] && "$LAB_ENV/bin/python" -c \
-    "import torch, transformers, onnxruntime, lance, boto3, hsemotion_onnx, yaml, sklearn" >/dev/null 2>&1; }
+    "import torch, transformers, onnxruntime, lance, boto3, hsemotion_onnx, yaml, sklearn, dlib, funasr, torchaudio" >/dev/null 2>&1; }
 
 # ---------------------------------------------------------------- NED env
 build_ned_env() {
@@ -112,10 +112,11 @@ build_lab_env() {
     command -v uv >/dev/null || "$NED_ENV/bin/pip" install -q uv
     local UV; UV=$(command -v uv || echo "$NED_ENV/bin/uv")
     [ -x "$LAB_ENV/bin/python" ] || "$UV" venv -q "$LAB_ENV" --python "$NED_ENV/bin/python" --system-site-packages
-    # torch comes from the NED env; install the rest of requirements.txt, keeping numpy < 2
+    # torch comes from the NED env. Use the venv's pip, NOT uv: uv ignores packages inherited via
+    # --system-site-packages and would download a second torch (~5 GB; this filled the disk once).
     grep -vE '^(--extra-index-url|torch==)' requirements.txt > "$LAB_ENV/requirements.lab.txt"
-    VIRTUAL_ENV="$LAB_ENV" "$UV" pip install -q -r "$LAB_ENV/requirements.lab.txt"
-    VIRTUAL_ENV="$LAB_ENV" "$UV" pip install -q "numpy<2"
+    "$LAB_ENV/bin/python" -m pip install -q --no-cache-dir -r "$LAB_ENV/requirements.lab.txt" \
+        --extra-index-url https://download.pytorch.org/whl/cu121
 }
 
 # ---------------------------------------------------------------- checkpoints
@@ -135,6 +136,13 @@ fetch_ckpts() {
     PATH="$NED_ENV/bin:$PATH" bash ned/download_checkpoints.sh || die "public checkpoint download failed"
     "$LAB_ENV/bin/python" -c "from hsemotion_onnx.facial_emotions import get_model_path as g; import urllib.request; \
         [g(m) for m in ('enet_b0_8_best_vgaf', 'enet_b2_8')]"
+    # C-MET's emotion classifiers (Google Drive, from the C-MET repo) + dlib's 5-point face predictor
+    local C="$HOME/.cache/emotion-lab/cmet"; mkdir -p "$C"
+    [ -f "$C/Emotion-FAN_MEAD.pth" ] || "$LAB_ENV/bin/gdown" -q 1H0tqOEe5-EqlmomB_FujgbrG8C7dadf1 -O "$C/Emotion-FAN_MEAD.pth"
+    [ -f "$C/Emotion-FAN_CREMA_D.pth" ] || "$LAB_ENV/bin/gdown" -q 1QZQj39N05lx_3Qidhs3wzArx6SPdHXFU -O "$C/Emotion-FAN_CREMA_D.pth"
+    [ -f "$C/shape_predictor_5_face_landmarks.dat" ] || { curl -fsSL http://dlib.net/files/shape_predictor_5_face_landmarks.dat.bz2 \
+        | bunzip2 > "$C/shape_predictor_5_face_landmarks.dat"; }
+    # emotion2vec+ (speech) downloads itself from Hugging Face on first use (~1.2 GB)
 }
 
 # ---------------------------------------------------------------- web

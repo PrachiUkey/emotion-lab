@@ -24,31 +24,31 @@ talkvid,Kj-DqufT7to_2560x1440_full_video_062_00,4832,neutral,medium,claude-visua
 talkvid,EvzYo-84-Ms_1920x1080_full_video_029_00,21639,neutral,high,claude-visual-v0,calm product demo
 talkvid,qBnPmm3ttvo_1920x1080_full_video_009_00,30942,neutral,high,claude-visual-v0,calm lecture
 talkvid,PuF96JKv-ws_1920x1080_full_video_001_00,6599,happy,medium,claude-visual-v0,smiling greeting
-dataset_clip,Yi7mKplsAV0_1920x1080_full_video_012_A_00,2884,sad,low,claude-visual-v0,"distressed; subtitles: ""what am I supposed to do"""
-dataset_clip,2RI48jj_RIo_1920x1080_full_video_048_B_00,5610,neutral,medium,claude-visual-v0,news commentary
-dataset_clip,hSKRkbcQNFQ_1920x1080_full_video_113_B_00,3703,neutral,high,claude-visual-v0,"relaxed interview; subtitle ""I think it is very interesting"""
-dataset_clip,CS-anBmcKUA_1920x1080_full_video_014_B_00,8341,neutral,medium,claude-visual-v0,animated talk-show guest
-dataset_clip,AeJYUh-JD9w_1920x1080_full_video_087_B_00,7937,happy,medium,claude-visual-v0,laughing podcast host
-dataset_clip,91TsjHfyWcI_1080x720_full_video_077_A_00,7243,neutral,medium,claude-visual-v0,"half-closed eyes, relaxed"
-dataset_clip,lcc7N_Vfh_k_1280x720_full_video_022_B_00,17302,neutral,low,claude-visual-v0,"small face, thinking pose"
-dataset_clip,lg16y_cOv7Y_1920x1080_full_video_026_B_00,17319,happy,medium,claude-visual-v0,smiling interview
-dataset_clip,Xmyud5O54Ds_1920x1080_full_video_071_B_00,13857,neutral,low,claude-visual-v0,"small face, lecturing"
-dataset_clip,BJyqy10gwdA_1920x1080_full_video_003_A_00,1178,sad,low,claude-visual-v0,"somber, hands clasped"
-dataset_clip,Ny9JHVUaW_c_1920x1080_full_video_163_C_00,11259,neutral,low,claude-visual-v0,"small face, interview"
-dataset_clip,jewpNOxumhk_406x720_full_video_074_A_00,16803,neutral,medium,claude-visual-v0,video call
-dataset_clip,kb88GNKWusg_1920x1080_full_video_039_B_01,17086,happy,medium,claude-visual-v0,smiling
-dataset_clip,dnvkwPgTTho_1920x1080_full_video_184_A_00,15600,happy,medium,claude-visual-v0,"smiling, glancing aside"
-dataset_clip,K3JPj9ACpZs_1920x1080_full_video_007_B_00,10234,neutral,medium,claude-visual-v0,"intense/emphatic podcast talk, not angry"
-dataset_clip,s3G3gzWlXaI_1920x1080_full_video_051_A_00,4523,neutral,low,claude-visual-v0,clip ends early; mild smile
-dataset_clip,QoCuEc7KMQQ_1920x1080_full_video_000_A_00,12132,neutral,medium,claude-visual-v0,news host
-dataset_clip,5Z3IhwNUiJ0_1920x1080_full_video_029_A_00,6311,neutral,high,claude-visual-v0,instructional talker
-dataset_clip,XChfEOoRfiY_1080x1920_full_video_000_A_01,13710,neutral,high,claude-visual-v0,calm video call
-dataset_clip,5VkRIjBXYG8_1920x1080_full_video_000_A_01,6261,happy,high,claude-visual-v0,broad smile
-dataset_clip,ebtysozM1YU_1920x1080_full_video_053_A_00,15737,disgusted,low,claude-visual-v0,skeptical grimace
-dataset_clip,nbTL_mSZQe8_1920x1080_full_video_036_A_00,17848,neutral,medium,claude-visual-v0,calm vlog
-dataset_clip,PQQEahWV9WA_1920x1080_full_video_039_A_01,11723,sad,low,claude-visual-v0,"somber, eyes lowered"
-dataset_clip,OBfKPqhXEuA_3840x2160_full_video_022_A_01,260,neutral,medium,claude-visual-v0,serious explainer
-dataset_clip,LKk1jrLqpUU_640x360_full_video_073_B_00,10611,neutral,medium,claude-visual-v0,podcast host talking calmly
+dataset_clip,Yi7mKplsAV0_1920x1080_full_video_012_A_00,2890,sad,low,claude-visual-v0,"distressed; subtitles: ""what am I supposed to do"""
+dataset_clip,2RI48jj_RIo_1920x1080_full_video_048_B_00,5616,neutral,medium,claude-visual-v0,news commentary
+dataset_clip,hSKRkbcQNFQ_1920x1080_full_video_113_B_00,3709,neutral,high,claude-visual-v0,"relaxed interview; subtitle ""I think it is very interesting"""
+dataset_clip,CS-anBmcKUA_1920x1080_full_video_014_B_00,8347,neutral,medium,claude-visual-v0,animated talk-show guest
+dataset_clip,AeJYUh-JD9w_1920x1080_full_video_087_B_00,7943,happy,medium,claude-visual-v0,laughing podcast host
+dataset_clip,91TsjHfyWcI_1080x720_full_video_077_A_00,7249,neutral,medium,claude-visual-v0,"half-closed eyes, relaxed"
+dataset_clip,lcc7N_Vfh_k_1280x720_full_video_022_B_00,17308,neutral,low,claude-visual-v0,"small face, thinking pose"
+dataset_clip,lg16y_cOv7Y_1920x1080_full_video_026_B_00,17325,happy,medium,claude-visual-v0,smiling interview
+dataset_clip,Xmyud5O54Ds_1920x1080_full_video_071_B_00,13863,neutral,low,claude-visual-v0,"small face, lecturing"
+dataset_clip,BJyqy10gwdA_1920x1080_full_video_003_A_00,1184,sad,low,claude-visual-v0,"somber, hands clasped"
+dataset_clip,Ny9JHVUaW_c_1920x1080_full_video_163_C_00,11265,neutral,low,claude-visual-v0,"small face, interview"
+dataset_clip,jewpNOxumhk_406x720_full_video_074_A_00,16809,neutral,medium,claude-visual-v0,video call
+dataset_clip,kb88GNKWusg_1920x1080_full_video_039_B_01,17092,happy,medium,claude-visual-v0,smiling
+dataset_clip,dnvkwPgTTho_1920x1080_full_video_184_A_00,15606,happy,medium,claude-visual-v0,"smiling, glancing aside"
+dataset_clip,K3JPj9ACpZs_1920x1080_full_video_007_B_00,10240,neutral,medium,claude-visual-v0,"intense/emphatic podcast talk, not angry"
+dataset_clip,s3G3gzWlXaI_1920x1080_full_video_051_A_00,4529,neutral,low,claude-visual-v0,clip ends early; mild smile
+dataset_clip,QoCuEc7KMQQ_1920x1080_full_video_000_A_00,12138,neutral,medium,claude-visual-v0,news host
+dataset_clip,5Z3IhwNUiJ0_1920x1080_full_video_029_A_00,6317,neutral,high,claude-visual-v0,instructional talker
+dataset_clip,XChfEOoRfiY_1080x1920_full_video_000_A_01,13716,neutral,high,claude-visual-v0,calm video call
+dataset_clip,5VkRIjBXYG8_1920x1080_full_video_000_A_01,6267,happy,high,claude-visual-v0,broad smile
+dataset_clip,ebtysozM1YU_1920x1080_full_video_053_A_00,15743,disgusted,low,claude-visual-v0,skeptical grimace
+dataset_clip,nbTL_mSZQe8_1920x1080_full_video_036_A_00,17854,neutral,medium,claude-visual-v0,calm vlog
+dataset_clip,PQQEahWV9WA_1920x1080_full_video_039_A_01,11729,sad,low,claude-visual-v0,"somber, eyes lowered"
+dataset_clip,OBfKPqhXEuA_3840x2160_full_video_022_A_01,266,neutral,medium,claude-visual-v0,serious explainer
+dataset_clip,LKk1jrLqpUU_640x360_full_video_073_B_00,10617,neutral,medium,claude-visual-v0,podcast host talking calmly
 talkvid,-59cJcC2HJY_1920x1080_full_video_030_00,0,happy,medium,claude-visual-v0,"Warm, friendly vlog delivery; light smile and raised cheeks while talking; never goes beyond mild positive."
 talkvid,-5dfWO18bN0_1920x1080_full_video_013_00,0,neutral,high,claude-visual-v0,"Calm explanatory skincare review; relaxed brows and mouth. Burned-in Chinese subtitles are informational: 'this one is medical-device grade... after cosmetic procedures, if your face is damaged you can use it directly'."
-dataset_clip,_JHGVmHL474_3840x2160_full_video_001_A_00,0,surprised,low,claude-visual-v0,"Animated, emphatic talker: raised brows, wide eyes and open mouth while pointing (reads as surprise/emphasis, not fear). Face turns to profile, then leaves frame for roughly the last third (arm pointing at a chart)."
+dataset_clip,_JHGVmHL474_3840x2160_full_video_001_A_00,6,surprised,low,claude-visual-v0,"Animated, emphatic talker: raised brows, wide eyes and open mouth while pointing (reads as surprise/emphasis, not fear). Face turns to profile, then leaves frame for roughly the last third (arm pointing at a chart)."

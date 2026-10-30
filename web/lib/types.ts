@@ -6,8 +6,13 @@ export type IndexEntry = {
   fragment: number;
   n_frames: number;
   face_frac: number;
+  fps?: number;
+  has_audio?: boolean;
   models: Record<string, ClipSummary>;
 };
+
+export type ModelMeta = { classes: string[]; trained_on?: string; kind?: string; modality?: 'face' | 'audio' };
+export type Word = { word: string; start: number; end: number };
 
 export type PredsDoc = {
   dataset: string;
@@ -21,6 +26,10 @@ export type PredsDoc = {
   frames: Record<string, (number[] | null)[]>;
   clip: Record<string, ClipSummary & { probs: number[] }>;
   face_frac: number;
+  fps_source?: 'dataset' | 'assumed';
+  transcript?: Word[];
+  warnings?: string[];
+  model_meta?: Record<string, ModelMeta>;
 };
 
 export type Gold = Record<string, { emotion: string; confidence?: string; annotator?: string; notes?: string }>;
@@ -33,6 +42,9 @@ export type LeaderRow = {
   accuracy: number;
   recall: Record<string, number>;
   neutral_fp_rate: number | null;
+  macro_f1_non_neutral?: number | null;
+  n_non_neutral?: number;
+  classes?: string[] | null;
   ece: number;
   flip_rate: number;
   confusion: number[][];

@@ -2,14 +2,15 @@
 
 **See what emotion every face shows, frame by frame — and find out which model gets it right.**
 
-Emotion Lab runs several facial-expression models on talking-head video clips, draws a face box with the
-predicted emotion and confidence on **every frame**, and scores each model against human labels so you can
-pick the best one. It also includes a working **NED** pipeline that can *change* the emotion in a video
-while keeping the speech.
+Emotion Lab runs several emotion models — on the **face** and on the **voice** — over talking-head video clips,
+draws a face box with the predicted emotion and confidence on **every frame**, and scores each model against
+human labels so you can pick the best one. It also includes a working **NED** pipeline that can *change* the
+emotion in a video while keeping the speech.
 
 | | |
 |---|---|
-| 🎞️ **Per-frame view** | Video player with face box + `happy 0.87` overlay, per model or all at once |
+| 🎞️ **Per-frame view** | Video (with sound) + face box + `happy 0.87` overlay, per model or all at once |
+| 🔊 **Face vs voice** | A speech-emotion model listens to the audio; live transcript under the video |
 | 📊 **Model comparison** | Leaderboard against human labels: macro-F1, confusion matrices, model agreement |
 | 🔍 **Find problems fast** | Filter clips where models disagree, or where a model differs from the human label |
 | 🧩 **Plug-in models** | Add a model with one line of config; only the new model is computed |
@@ -152,8 +153,33 @@ clip index. Refresh the dashboard to see them — no restart needed.
 - Try it on a few clips first: `--limit 5`
 - Write straight to R2 instead of local disk: `--store r2:dump-bucket/emotion-lab`
 
-> The source datasets store frames and face landmarks but **no audio and no frame rate**; videos are rebuilt
-> at an assumed 25 fps, and labels are based on the face only.
+- Rebuild existing videos (e.g. to add sound): `--reencode`
+
+**Datasets** (all Lance tables in R2, one row per frame with JPEG + 68 face landmarks):
+
+| Dataset | Where | Audio | Extras |
+|---|---|---|---|
+| `talkvid` | `fullbodydataset/talkvid/lance` | all clips | — |
+| `dataset_clip` | `fullbodydataset/dataset_clip` | ~61% of clips | — |
+| `seamless` | `semless-dataset/seamless_lance` | per clip | transcripts, Meta's own emotion scores |
+
+Each clip uses its real frame rate and its own audio (both looked up from the dataset's `timing` / `storage`
+tables). Make a seamless test set with `scripts/build_seamless_manifest.py` (half talking, half listening).
+
+### Models
+
+| Model | Looks at | Emotions it can say | Notes |
+|---|---|---|---|
+| `hsemotion_b0`, `hsemotion_b2` | face | 8 (incl. neutral, contempt) | AffectNet |
+| `vit_fer` | face | 7 (no contempt) | FER2013 |
+| `cmet_mead` | face | 7 — **no neutral** | the classifier [C-MET](https://github.com/ChanHyeok-Choi/C-MET) uses to grade its videos (MEAD) |
+| `cmet_crema` | face | 5 — **no neutral / surprise / contempt** | same, CREMA-D |
+| `speech_emotion2vec` | **voice** | 7 (no contempt) | emotion2vec+ large, the speech-emotion encoder C-MET uses; 2-s sliding window |
+| `seamless_imitator` | face (precomputed) | 8 | scores shipped with the Seamless dataset; class order verified against `hsemotion_b0` |
+
+> **C-MET is an emotion-editing model.** What's shown here is how it *detects* emotion: its evaluation
+> classifier (face) and its speech-emotion encoder (voice). Running C-MET's video *generation* needs ~10 GB of
+> extra disk and is not set up yet.
 
 ---
 
