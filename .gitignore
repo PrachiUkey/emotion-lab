@@ -9,6 +9,16 @@ web/.env*
 rclone.conf
 *.pem
 *.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+*credentials*.json
+*service-account*.json
+.netrc
+.npmrc
+.aws/
+.r2/
 
 # --- model weights / checkpoints (live in r2:dump-bucket/emotions_ckpt) ---
 checkpoints*/
@@ -20,33 +30,69 @@ manipulator_checkpoints/
 *.onnx
 *.npz
 *.safetensors
+*.bin
+*.h5
+*.dat
+*.pkl
+*.pickle
 ned/DECA/data/generic_model.pkl
+.cache/
+.hf_home/
 
-# --- generated data ---
+# --- generated data (dashboard data lives in data_store/ and r2:dump-bucket/emotion-lab) ---
+data_store/
+data_cache/
 ned/runs/
 runs/
 outputs/
-data_cache/
+*.lance/
 *.mp4
 *.webm
-*.lance/
+*.avi
+*.mov
+*.mkv
+*.wav
+*.mp3
+*.flac
+*.m4a
+*.zip
+*.tar.gz
+*.tgz
+*.bz2
+
+# --- logs ---
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # --- python ---
 __pycache__/
-*.pyc
+*.py[cod]
 .venv/
+venv/
 *.egg-info/
+build/
+dist/
 .ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 
 # --- web ---
 web/node_modules/
 web/.next/
 web/out/
 .vercel/
+*.tsbuildinfo
 
 # --- os/editor ---
 .DS_Store
+Thumbs.db
 .vscode/
 .idea/
-data_store/
-*.tsbuildinfo
+*.swp
+*~
