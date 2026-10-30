@@ -2,9 +2,9 @@
 
 export const MODEL_INFO: Record<string, string> = {
   hsemotion_b0:
-    'A small, fast emotion model trained on ~400,000 internet photos of faces (AffectNet), each tagged with one of ' +
-    '8 emotions, then fine-tuned on group videos. It reacts strongly to mouth shapes, so people who are just talking ' +
-    'often get read as emotional.',
+    'A small, fast emotion model (EfficientNet-B0) trained on AffectNet — hundreds of thousands of internet face ' +
+    'photos, each tagged with one of 8 emotions. This is the version its authors also report on group videos (VGAF). ' +
+    'It reacts strongly to mouth shapes, so people who are just talking often get read as emotional.',
   hsemotion_b2:
     'A bigger sibling of hsemotion_b0, trained on the same photo collection with 8 emotions. Bigger is not better ' +
     'here: it is the least sure of itself and most often calls a calm face emotional.',

@@ -7,7 +7,7 @@ models:
   hsemotion_b0:
     kind: hsemotion
     variant: enet_b0_8_best_vgaf
-    trained_on: AffectNet (8 classes), fine-tuned on VGAF
+    trained_on: AffectNet (8 classes); face-ID pre-training on VGGFace2. '_vgaf' = the variant the authors report on VGAF
     license: Apache-2.0
   hsemotion_b2:
     kind: hsemotion

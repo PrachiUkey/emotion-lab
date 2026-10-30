@@ -1,0 +1,685 @@
+===============================================================================
+ EMOTION LAB - STUDY GUIDE TO EVERY MODEL
+===============================================================================
+ Last checked: 2026-10-30.
+ Every paper link below was checked against arXiv's official API (title,
+ authors, date) or opened directly; every code/weights link returned HTTP 200.
+ Facts marked [from model card] / [from README] / [from code] say where they
+ come from. Anything we could not confirm is marked [unverified].
+ Numbers marked "our results" come from data_store/eval/leaderboard.json
+ (Emotion Lab's own evaluation, 2026-10-30).
+
+-------------------------------------------------------------------------------
+ CONTENTS
+-------------------------------------------------------------------------------
+  0. How to read this file
+  1. Shared background (what every model gets as input; how we score them)
+  2. The models shown in the dashboard
+       2.1 hsemotion_b0
+       2.2 hsemotion_b2
+       2.3 vit_fer
+       2.4 cmet_mead
+       2.5 cmet_crema
+       2.6 speech_emotion2vec   (voice)
+       2.7 seamless_imitator    (precomputed, Seamless clips only)
+  3. C-MET itself (the emotion-EDITING model)
+  4. NED (the emotion-editing pipeline in ned/) and its parts
+  5. Datasets mentioned in this file
+  6. Cheat-sheet: all models side by side
+  7. Suggested reading order + glossary
+
+===============================================================================
+ 0. HOW TO READ THIS FILE
+===============================================================================
+ Each model in section 2 uses the same template:
+   Summary / Who made it / Paper(s) / Code & weights / What it does /
+   Trained on / Emotions it can output (exact order) / Input preprocessing /
+   How Emotion Lab runs it / Limitations / Our results / What to read first
+
+ "Dashboard name" = the button label on the clip page (Overlay panel).
+
+===============================================================================
+ 1. SHARED BACKGROUND
+===============================================================================
+ 1.1 The data
+   Clips come from Lance tables in Cloudflare R2: one row per video frame
+   with a JPEG image and 68 face landmarks (x, y in full-frame pixels).
+   Datasets: talkvid, dataset_clip (bucket "fullbodydataset") and seamless
+   (bucket "semless-dataset"). See section 5.
+
+ 1.2 Face box (used by the face models except C-MET)  [from code]
+   emotion_lab/data.py -> face_box(): take the bounding box of the 68
+   landmarks, widen it 10% left and right, extend it 30% upward (forehead)
+   and 5% downward. Frames whose landmarks are missing/invalid get no box
+   and therefore no face prediction ("no face" / "-" in the dashboard).
+
+ 1.3 One shared label set  [from code: emotion_lab/labels.py]
+   neutral, happy, sad, surprised, fear, disgusted, angry, contempt
+   Every model's own class names are mapped onto these. If a model does not
+   have a class (e.g. C-MET has no "neutral"), that class gets probability
+   0 and the dashboard shows it as "can't say".
+
+ 1.4 Per-frame vs whole-clip
+   - Per frame: each model outputs a probability for each emotion (they sum
+     to 1). The top one is the frame's label; its probability is the
+     "confidence" shown (e.g. happy 0.87).
+   - Whole clip: mean of the per-frame probabilities over frames with a face
+     (voice model: one pass over the clip's sounding audio, see 2.6).
+   - Logits -> probabilities: models output raw scores ("logits"); softmax
+     turns them into probabilities that sum to 1.
+
+ 1.5 How models are scored (leaderboard)  [from code: emotion_lab/evaluate.py]
+   Gold labels: 53 clips labelled by visual inspection, one label per clip,
+   with a confidence (low/medium/high) - gold/labels_v0.csv.
+   - Macro-F1 (main score): F1 per emotion, averaged so every emotion counts
+     equally. Plain accuracy would reward always answering "neutral".
+   - 95% CI: bootstrap (1000 resamples) range of macro-F1. Overlapping
+     ranges = too close to call.
+   - Macro-F1 non-neutral: same, only on clips a human called emotional -
+     the fair comparison for models that cannot say "neutral".
+   - Neutral FP rate: share of human-neutral clips the model called
+     emotional (talking mouths cause this).
+   - ECE (expected calibration error): does "0.8 confident" mean right 80%
+     of the time? 0 = perfectly calibrated.
+   - Frame flip rate: share of consecutive frames where the top label
+     changes (jitter).
+   - Cohen's / Fleiss' kappa: agreement between models beyond chance
+     (1 = always agree, 0 = chance level).
+
+===============================================================================
+ 2. THE MODELS SHOWN IN THE DASHBOARD
+===============================================================================
+
+-------------------------------------------------------------------------------
+ 2.1 hsemotion_b0
+-------------------------------------------------------------------------------
+ Summary
+   Small, fast facial-expression classifier (EfficientNet-B0) from the
+   HSEmotion / EmotiEffLib family. Looks at the FACE, one frame at a time.
+
+ Who made it
+   Andrey V. Savchenko (HSE University) and co-authors.
+
+ Paper(s)
+   - A. V. Savchenko, "Facial expression and attributes recognition based on
+     multi-task learning of lightweight neural networks", IEEE SISY 2021.
+     https://arxiv.org/abs/2103.17107
+   - A. V. Savchenko, L. V. Savchenko, I. Makarov, "Classifying emotions and
+     engagement in online learning based on a single facial expression
+     recognition neural network", IEEE Transactions on Affective
+     Computing, 2022.  https://ieeexplore.ieee.org/document/9815154
+   - Backbone: M. Tan, Q. V. Le, "EfficientNet: Rethinking Model Scaling for
+     Convolutional Neural Networks", ICML 2019.
+     https://arxiv.org/abs/1905.11946
+
+ Code & weights
+   - https://github.com/HSE-asavchenko/face-emotion-recognition
+     (library now called EmotiEffLib)
+   - pip package used here: hsemotion-onnx  https://pypi.org/project/hsemotion-onnx/
+   - Weights: enet_b0_8_best_vgaf.onnx (downloaded by the package to
+     ~/.hsemotion/; backed up in r2:dump-bucket/emotions_ckpt/classifiers/hsemotion/)
+   - Licence: Apache-2.0; README: "no limitation for both academic and
+     commercial usage".  [from README]
+
+ What it does
+   CNN image classifier. Input: one face crop, 224x224 RGB. Output: 8 logits.
+   The 2021 paper's approach: lightweight CNNs first trained for face
+   identification and facial attributes, then fine-tuned to predict facial
+   expressions; the paper reports near state-of-the-art emotion results on
+   AffectNet.  [from abstract]
+   The README says the models were pre-trained for face identification on
+   VGGFace2.  [from README]
+
+ Trained on
+   AffectNet (8 categories).  README reports this model's AffectNet 8-class
+   accuracy as 61.32% and its VGAF accuracy as 68.29%.  [from README]
+   The "_vgaf" suffix: the README lists this as the model reported on VGAF
+   (Video level Group AFfect, https://ieeexplore.ieee.org/document/8925231);
+   it does NOT state the exact training procedure behind the suffix.
+
+ Emotions it can output (exact model output order)  [from code: hsemotion_onnx]
+   0 Anger, 1 Contempt, 2 Disgust, 3 Fear, 4 Happiness, 5 Neutral,
+   6 Sadness, 7 Surprise
+
+ Input preprocessing  [from code]
+   RGB crop -> resize 224x224 -> /255 -> normalise with ImageNet mean
+   (0.485, 0.456, 0.406) and std (0.229, 0.224, 0.225) -> softmax on output.
+
+ How Emotion Lab runs it
+   emotion_lab/models/hsemotion.py (class HSEmotion), config key
+   hsemotion_b0 in configs/models.yaml. We create our own ONNX Runtime
+   session on the GPU (the library hard-codes CPU) and batch frames; output
+   matches the library to within 0.0004 (checked). Input = face box (1.2).
+
+ Limitations
+   - Single frame, face only: reads mouth shapes from speech as emotions.
+   - Our data: called 73-75% of human-neutral clips emotional.
+
+ Our results (53 gold clips)
+   Medium+high confidence labels (42 clips: 28 neutral, 14 happy):
+     macro-F1 0.546 (95% CI 0.38-0.68), non-neutral 0.783, accuracy 0.38,
+     neutral FP 0.75, ECE 0.109, flip rate 0.159.
+   All labels (53 clips):
+     macro-F1 0.467 (0.24-0.62), non-neutral 0.696, neutral FP 0.73.
+
+ What to read first
+   2103.17107: the abstract, then the section on fine-tuning for facial
+   expressions and the AffectNet results table.
+
+-------------------------------------------------------------------------------
+ 2.2 hsemotion_b2
+-------------------------------------------------------------------------------
+ Summary
+   Larger sibling of hsemotion_b0 (EfficientNet-B2). FACE, per frame.
+
+ Who made it / Paper(s) / Code & licence
+   Same as 2.1 (Savchenko et al.; Apache-2.0).
+   Weights: enet_b2_8.onnx.
+
+ What it does
+   Same design as 2.1 with a bigger backbone. Input 260x260.  [from code]
+
+ Trained on
+   AffectNet, 8 categories. README AffectNet 8-class accuracy: 63.03%.
+   [from README]
+
+ Emotions it can output (exact order)
+   Same as 2.1: Anger, Contempt, Disgust, Fear, Happiness, Neutral,
+   Sadness, Surprise.
+
+ Input preprocessing
+   As 2.1 but resized to 260x260.
+
+ How Emotion Lab runs it
+   Same class as 2.1 (emotion_lab/models/hsemotion.py), config key
+   hsemotion_b2.
+
+ Limitations
+   - On our data it is the least confident face model and the most likely
+     to call a calm face emotional (neutral FP 0.85-0.86).
+   - Better AffectNet accuracy did not carry over to our footage.
+
+ Our results
+   Medium+high (42): macro-F1 0.398 (0.22-0.56), non-neutral 0.600,
+     accuracy 0.24, neutral FP 0.86, ECE 0.083, flip 0.151.
+   All (53): macro-F1 0.359 (0.17-0.49), non-neutral 0.583, neutral FP 0.85.
+
+ What to read first
+   Same papers as 2.1; compare B0 vs B2 rows in the README results table.
+
+-------------------------------------------------------------------------------
+ 2.3 vit_fer
+-------------------------------------------------------------------------------
+ Summary
+   Vision Transformer fine-tuned for facial expressions on FER2013.
+   FACE, per frame. Currently the best single model on our labels.
+
+ Who made it
+   Hugging Face user "trpakov" (community model). The base model is
+   Google's ViT.
+
+ Paper(s)
+   - Base architecture: A. Dosovitskiy et al., "An Image is Worth 16x16
+     Words: Transformers for Image Recognition at Scale", 2020 (ICLR 2021).
+     https://arxiv.org/abs/2010.11929
+   - Training data: I. J. Goodfellow et al., "Challenges in Representation
+     Learning: A report on three machine learning contests", 2013 (FER2013).
+     https://arxiv.org/abs/1307.0414
+   - There is no paper for this specific fine-tuned checkpoint.
+
+ Code & weights
+   - https://huggingface.co/trpakov/vit-face-expression
+   - Base checkpoint: https://huggingface.co/google/vit-base-patch16-224-in21k
+   - ViT code: https://github.com/google-research/vision_transformer
+   - Licence: apache-2.0  [from model card]
+
+ What it does
+   Splits the face image into 16x16 patches and processes them with a
+   Transformer; outputs 7 logits.  Card: fine-tuned from
+   vit-base-patch16-224-in21k; augmentation with random rotations, flips
+   and zooms.  [from model card]
+
+ Trained on
+   FER2013: 35887 face images, resized to 48x48 pixels and converted to
+   grayscale, in 7 categories.  [from 1307.0414]
+   Card reports validation accuracy 0.7113 and test accuracy 0.7116.
+   [from model card]
+
+ Emotions it can output (exact order)  [from the checkpoint's config]
+   0 angry, 1 disgust, 2 fear, 3 happy, 4 neutral, 5 sad, 6 surprise
+   (no "contempt"). Note: the model card lists the labels in a different
+   order (Angry, Disgust, Fear, Happy, Sad, Surprise, Neutral); Emotion Lab
+   uses the order stored in the checkpoint's config (id2label), which is
+   what the network actually outputs.
+
+ Input preprocessing
+   The checkpoint's own Hugging Face image processor (resize + normalise);
+   input is our face box crop (1.2), colour RGB.
+
+ How Emotion Lab runs it
+   emotion_lab/models/hf_image.py (class HFImageClassifier, transformers
+   4.46.3), config key vit_fer. Any HF image classifier with emotion labels
+   can be added the same way.
+
+ Limitations
+   - Trained on small grayscale faces; our input is colour and larger.
+   - Card's own caveat: performance depends on biases/diversity of the
+     training data.
+   - Never says "contempt".
+
+ Our results
+   Medium+high (42): macro-F1 0.667 (0.51-0.81), non-neutral 0.833,
+     accuracy 0.62, neutral FP 0.43, ECE 0.070, flip 0.160.
+   All (53): macro-F1 0.385 (0.23-0.48), non-neutral 0.367, neutral FP 0.45.
+   (It does well on neutral/happy, but missed the rare sad/surprised/
+   disgusted gold clips - that is why the "all labels" score drops.)
+
+ What to read first
+   ViT paper sections 3.1 (model) and 4 (experiments); FER2013 section of
+   1307.0414 (how the images were collected and labelled).
+
+-------------------------------------------------------------------------------
+ 2.4 cmet_mead
+-------------------------------------------------------------------------------
+ Summary
+   The emotion classifier that C-MET's authors use to GRADE the videos
+   their editing model generates. ResNet18 on single face frames,
+   fine-tuned on MEAD. 7 emotions, NO neutral. FACE, per frame.
+
+ Who made it
+   Classifier code: Emotion-FAN (Debin Meng et al.); the MEAD-finetuned
+   checkpoint is released by the C-MET authors (Chanhyuk Choi et al., UNIST).
+
+ Paper(s)
+   - C-MET (where this classifier is used for "emotion accuracy"):
+     C. Choi, T. Kim, D. Lee, S. Jung, T. Kim, "Cross-Modal Emotion Transfer
+     for Emotion Editing in Talking Face Video", CVPR 2026.
+     https://arxiv.org/abs/2604.07786
+   - Code base: D. Meng, X. Peng, K. Wang, Y. Qiao, "Frame attention
+     networks for facial expression recognition in videos", ICIP 2019.
+     https://arxiv.org/abs/1907.00193
+   - Backbone: K. He, X. Zhang, S. Ren, J. Sun, "Deep Residual Learning for
+     Image Recognition", 2015.  https://arxiv.org/abs/1512.03385
+   - Initialisation data: E. Barsoum et al., "Training Deep Networks for
+     Facial Expression Recognition with Crowd-Sourced Label Distribution",
+     ICMI 2016 (FER+).  https://arxiv.org/abs/1608.01041
+   - Fine-tuning data: K. Wang et al., "MEAD: A Large-scale Audio-visual
+     Dataset for Emotional Talking-face Generation", ECCV 2020.
+     https://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123660698.pdf
+
+ Code & weights
+   - C-MET repo (evaluation/Emotion-FAN):
+     https://github.com/ChanHyeok-Choi/C-MET   (licence Apache-2.0)
+   - Emotion-FAN original: https://github.com/Open-Debin/Emotion-FAN
+   - Weights: Emotion-FAN_MEAD.pth, Google Drive id
+     1H0tqOEe5-EqlmomB_FujgbrG8C7dadf1 (link from C-MET evaluation/README).
+     Stored here in ~/.cache/emotion-lab/cmet/ and in the checkpoint
+     manifest (classifiers/cmet/).
+
+ What it does  [from C-MET code: evaluation/Emotion-FAN/emotion-fan.py]
+   torchvision ResNet18 with a 7-way output, initialised from
+   "Resnet18_FER+_pytorch.pth.tar", fine-tuned on MEAD. In C-MET's
+   evaluation each of 16 sampled frames is classified separately and the
+   video label = mean of the per-frame logits.
+   IMPORTANT: despite the "Emotion-FAN" folder name, this evaluation path
+   does NOT use FAN's frame-attention module - it just averages frames.
+
+ Trained on
+   FER+ (initialisation), then MEAD: 60 actors/actresses talking with
+   8 emotions at 3 intensity levels, filmed from 7 angles in a controlled
+   studio.  [from MEAD README]
+
+ Emotions it can output (exact order)  [from C-MET code]
+   0 happy, 1 angry, 2 disgusted, 3 fear, 4 sad, 5 contempt, 6 surprised
+   NO neutral. C-MET's evaluation never runs it on neutral clips: it marks
+   those "neutral" without calling the model.  [from C-MET code]
+
+ Input preprocessing  [from C-MET / Emotion-FAN code]
+   dlib 5-point face alignment, dlib.get_face_chip(size=224, padding=0.25),
+   then ImageNet normalisation; softmax per frame.
+
+ How Emotion Lab runs it
+   emotion_lab/models/cmet.py (class CMetEmotionFAN), config key cmet_mead.
+   We reproduce their alignment with dlib's own 5-point predictor
+   (shape_predictor_5_face_landmarks.dat), run inside our landmark box
+   instead of dlib's face detector. Weights load strictly (all keys match)
+   with torch's safe weights_only loader.
+
+ Limitations
+   - Cannot say neutral -> on calm faces it is forced to pick an emotion
+     (neutral FP = 1.00 by construction).
+   - Trained on studio actors performing emotions; our footage is
+     in-the-wild. On our happy clips it found only 50%.
+
+ Our results
+   Medium+high (42): macro-F1 0.292 (0.14-0.40), non-neutral 0.667,
+     accuracy 0.17, neutral FP 1.00, ECE 0.361.
+   All (53): macro-F1 0.179 (0.08-0.26), non-neutral 0.333.
+
+ What to read first
+   C-MET paper: the evaluation / metrics section ("emotion accuracy").
+   Emotion-FAN paper section 2 (feature embedding module) - the part used.
+
+-------------------------------------------------------------------------------
+ 2.5 cmet_crema
+-------------------------------------------------------------------------------
+ Summary
+   Same classifier as 2.4, fine-tuned on CREMA-D instead of MEAD.
+   Only 5 emotions. FACE, per frame.
+
+ Paper(s) / Code
+   As 2.4, plus the dataset paper:
+   H. Cao, D. G. Cooper, M. K. Keutmann, R. C. Gur, A. Nenkova, R. Verma,
+   "CREMA-D: Crowd-sourced Emotional Multimodal Actors Dataset", IEEE
+   Transactions on Affective Computing 5(4):377-390, 2014.
+   DOI 10.1109/TAFFC.2014.2336244   https://github.com/CheyneyComputerScience/CREMA-D
+   Weights: Emotion-FAN_CREMA_D.pth, Google Drive id
+   1QZQj39N05lx_3Qidhs3wzArx6SPdHXFU.
+
+ What it does
+   torchvision ResNet18 with a 5-way output (checked: the checkpoint's
+   final layer has 5 outputs).  [from checkpoint + C-MET code
+   evaluation/Emotion-FAN/emotion-fan_crema.py]
+
+ Trained on
+   FER+ initialisation, then CREMA-D: 7,442 clips from 91 actors (48 male,
+   43 female, aged 20-74), 6 emotions (anger, disgust, fear, happy,
+   neutral, sad), rated by 2,443 crowd-sourced raters.  [from CREMA-D README]
+   The classifier uses 5 of these (no neutral).
+
+ Emotions it can output (exact order)  [from C-MET code]
+   0 happy, 1 angry, 2 disgusted, 3 fear, 4 sad
+   NO neutral, NO surprise, NO contempt.
+
+ Input preprocessing / How Emotion Lab runs it
+   Identical to 2.4 (config key cmet_crema).
+
+ Limitations
+   - Can only pick among 5 emotions -> neutral FP = 1.00 by construction.
+   - On our data it often reads smiles as angry or sad: found 14% of
+     happy clips (medium+high labels).
+
+ Our results
+   Medium+high (42): macro-F1 0.118 (0.00-0.25), non-neutral 0.250,
+     accuracy 0.05, ECE 0.571.
+   All (53): macro-F1 0.247 (0.05-0.36), non-neutral 0.417
+     (it caught 3 of 4 sad clips).
+
+-------------------------------------------------------------------------------
+ 2.6 speech_emotion2vec   (VOICE)
+-------------------------------------------------------------------------------
+ Summary
+   Speech-emotion model that LISTENS to the clip's audio (not the face):
+   emotion2vec+ large. This is the audio emotion encoder C-MET builds on.
+
+ Who made it
+   Ziyang Ma, Zhisheng Zheng, Jiaxin Ye, Jinchao Li, Zhifu Gao et al.
+   (emotion2vec team; released through Alibaba's FunASR toolkit).
+
+ Paper(s)
+   Z. Ma et al., "emotion2vec: Self-Supervised Pre-Training for Speech
+   Emotion Representation", 2023 (ACL Findings 2024 [unverified venue]).
+   https://arxiv.org/abs/2312.15185
+
+ Code & weights
+   - https://github.com/ddlBoJack/emotion2vec
+   - Weights: https://huggingface.co/emotion2vec/emotion2vec_plus_large
+     (~1.2 GB, downloaded automatically on first use)
+   - Runtime: FunASR  https://github.com/modelscope/FunASR
+   - Licence: listed as "model-license" on the card; terms not stated
+     there.  [from model card]
+
+ What it does
+   emotion2vec: a universal speech-emotion representation, pre-trained on
+   unlabelled emotion data by self-supervised online distillation
+   (utterance-level + frame-level losses).  [from abstract]
+   emotion2vec+ (the "plus" models): fine-tuned for speech emotion
+   recognition. "large" ~300M parameters, fine-tuned on 42,526 hours of
+   filtered pseudo-labelled data ("40k out of 160k hours").
+   [from model card; the card says data-engineering details are not yet
+   published]
+
+ Trained on
+   As above (pseudo-labelled speech; sources not fully disclosed).
+
+ Emotions it can output (exact order)  [from model card + our run]
+   0 angry, 1 disgusted, 2 fearful, 3 happy, 4 neutral, 5 other, 6 sad,
+   7 surprised, 8 unknown (<unk>).  Input: 16 kHz audio.
+   Emotion Lab drops "other" and "unknown" and renormalises the other 7.
+   No "contempt".
+
+ How Emotion Lab runs it  [from code: emotion_lab/models/audio_emotion2vec.py]
+   - Audio: the clip's WAV (from the dataset's storage table), mono,
+     resampled to 16 kHz.
+   - Per frame: a 2-second window slides in 0.5-second steps; each video
+     frame gets the window centred nearest to it. So it changes slowly
+     (flip rate 0.014 vs ~0.15 for face models).
+   - Silence gate: windows quieter than -55 dBFS get NO prediction, and a
+     clip with < 20% sounding windows gets no verdict. Reason: on near-silent
+     audio the model answers "sad" (found on 23 of 30 Seamless "listening"
+     clips at -71 to -82 dBFS).
+   - Whole clip: one pass over all sounding audio (not an average).
+   - Dashboard: its label is drawn in the video's top-left corner
+     (no face needed); badge "voice".
+
+ Limitations
+   - Judges tone of voice, which often differs from the face: on our gold
+     set it missed most happy-looking clips (people who look happy often
+     sound neutral). On the 33 Seamless clips that have a voice verdict,
+     its clip label matched a face model's on only 15-36% of clips
+     (hsemotion_b0 15%, seamless_imitator 27%, vit_fer 36%).
+   - 2-second windows: cannot follow fast expression changes.
+
+ Our results
+   Medium+high (42): macro-F1 0.494 (0.34-0.63), non-neutral 0.526,
+     accuracy 0.52, neutral FP 0.39 (lowest of all models), ECE 0.443.
+   All (53): macro-F1 0.190 (0.13-0.24), non-neutral 0.125, neutral FP 0.36.
+
+ What to read first
+   2312.15185: the method section (online distillation) and the IEMOCAP
+   results; then the emotion2vec_plus_large model card (training data).
+
+-------------------------------------------------------------------------------
+ 2.7 seamless_imitator   (PRECOMPUTED - Seamless clips only)
+-------------------------------------------------------------------------------
+ Summary
+   Per-frame emotion scores that ship WITH the Seamless Interaction
+   dataset. We did not run this model; we only display its outputs.
+
+ Who made it
+   Meta (FAIR), as part of the Seamless Interaction dataset.
+
+ Paper(s)
+   V. Agrawal et al. (Meta), "Seamless Interaction: Dyadic Audiovisual
+   Motion Modeling and Large-Scale Dataset", 2025.
+   https://arxiv.org/abs/2506.22554
+
+ Code & data
+   - https://github.com/facebookresearch/seamless_interaction
+   - https://huggingface.co/datasets/facebook/seamless-interaction
+   - Dataset licence: CC-BY-NC 4.0 (non-commercial).  [from README]
+
+ What it does
+   The README says the movement features (which include emotion_scores,
+   emotion_valence, emotion_arousal) are "output of the Imitator model".
+   The model itself is not released.  [from README]
+   emotion_scores = "detected emotion categorical scores with 8 categories".
+   In our copy they are raw logits (range about -5.5 to +5.8); all-zero or
+   null rows mean "not computed" (about half the frames).
+
+ Emotions it can output (exact order)
+   Anger, Contempt, Disgust, Fear, Happiness, Neutral, Sadness, Surprise.
+   Meta lists these alphabetically without saying it is the array order.
+   We verified it: on 835 frames from 10 Seamless clips, each index
+   correlated best with the same class of hsemotion_b0 (8/8; Happiness
+   r=0.92, Neutral 0.79, Surprise 0.75, Sadness 0.69, Anger 0.63,
+   Disgust 0.50, Contempt 0.44, Fear 0.44).
+
+ How Emotion Lab runs it
+   emotion_lab/models/dataset_column.py (kind dataset_column): softmax over
+   the stored logits per frame; runs only on the "seamless" dataset.
+
+ Limitations
+   - Model unknown/unreleased; cannot be run on other data.
+   - Seamless clips have no human labels yet -> no leaderboard score.
+   - Agreement with our models on the 60 Seamless clips: same clip label
+     as hsemotion_b0 on 53% of clips, as vit_fer on 50%.
+
+===============================================================================
+ 3. C-MET ITSELF (EMOTION EDITING)
+===============================================================================
+ Paper: C. Choi, T. Kim, D. Lee, S. Jung, T. Kim, "Cross-Modal Emotion
+   Transfer for Emotion Editing in Talking Face Video", CVPR 2026.
+   https://arxiv.org/abs/2604.07786   Project: https://chanhyeok-choi.github.io/C-MET/
+ Code: https://github.com/ChanHyeok-Choi/C-MET (Apache-2.0)
+ Weights: https://huggingface.co/coldhyuk/C-MET (C-MET checkpoint plus
+   EDTalk weights: EDTalk.pt, EDTalk-V.pt, Audio2Lip.pt)
+
+ What it does  [from abstract]
+   Generates talking-face video whose facial expression follows a target
+   emotion taken from SPEECH. It models "emotion semantic vectors" between
+   speech and visual feature spaces, using a large pretrained audio encoder
+   (emotion2vec+ large - the same model as 2.6) and a disentangled facial
+   expression encoder. Inputs: a source face image, driving audio, a pose
+   video and emotion2vec features of the target emotion. Can also produce
+   "extended" emotions (e.g. sarcastic, charismatic). The README reports
+   ~14% better emotion accuracy than prior methods on MEAD and CREMA-D.
+
+ How it relates to Emotion Lab
+   - Its emotion DETECTION pieces are in the dashboard: the face classifier
+     it uses for evaluation (2.4, 2.5) and its speech-emotion encoder (2.6).
+   - Its video GENERATION is not set up: it needs its own environment
+     (transformers 4.31, audiocraft, funasr, whisper, gfpgan) and ~8-10 GB
+     of weights/env, more than the free disk on this machine.
+
+===============================================================================
+ 4. NED (EMOTION EDITING PIPELINE IN ned/)
+===============================================================================
+ Paper: F. Paraperas Papantoniou, P. P. Filntisis, P. Maragos,
+   A. Roussos, "Neural Emotion Director: Speech-preserving semantic control
+   of facial expressions in 'in-the-wild' videos", CVPR 2022 (oral).
+   https://arxiv.org/abs/2112.00585   Project: https://foivospar.github.io/NED/
+ Code: https://github.com/foivospar/NED (MIT)
+
+ What it does  [from abstract]
+   Changes an actor's emotion in a video while keeping lip movements:
+   (1) fit a 3D face model per frame (separates identity, pose,
+   expression); (2) a domain-translation network changes the expression
+   parameters to the target emotion (from a label or a reference video);
+   (3) a person-specific neural renderer paints the new face back into the
+   frame. Emotions: neutral, angry, disgusted, fear, happy, sad, surprised.
+   Usage: ned/main.py (see README). A new person needs a renderer
+   fine-tune (~1.5 h for a 3-minute video on an RTX 4090).
+
+ Its parts
+   - DECA (3D face reconstruction): Y. Feng, H. Feng, M. J. Black,
+     T. Bolkart, "Learning an Animatable Detailed 3D Face Model from
+     In-The-Wild Images", SIGGRAPH 2021 / ACM ToG 40(4).
+     https://arxiv.org/abs/2012.04012   https://github.com/yfeng95/DECA
+   - FLAME (the 3D face model DECA fits; licence-gated):
+     https://flame.is.tue.mpg.de/  (paper: "Learning a model of facial
+     shape and expression from 4D scans", ACM Transactions on Graphics
+     (Proc. SIGGRAPH Asia) 2017 - title confirmed on that page)
+   - FSGAN face segmenter (lfw_figaro_unet_256_2_0_segmentation_v1.pth):
+     Y. Nirkin, Y. Keller, T. Hassner, "FSGAN: Subject Agnostic Face
+     Swapping and Reenactment", ICCV 2019.
+     https://arxiv.org/abs/1908.05932   https://github.com/YuvalNirkin/fsgan
+   - Neural renderer based on Head2Head: M. R. Koujan, M. C. Doukas,
+     A. Roussos et al., "Head2Head: Video-based Neural Head Synthesis",
+     IEEE FG 2020.  https://arxiv.org/abs/2005.10954
+     https://github.com/michaildoukas/head2head
+   - dlib (face landmarks / alignment tools): http://dlib.net/
+
+===============================================================================
+ 5. DATASETS MENTIONED IN THIS FILE
+===============================================================================
+ AffectNet  (used by: hsemotion_b0, hsemotion_b2)
+   A. Mollahosseini, B. Hasani, M. H. Mahoor, IEEE Trans. Affective
+   Computing 2017.  https://arxiv.org/abs/1708.03985
+   >1,000,000 internet face images (1250 emotion keywords, 6 languages);
+   about half manually annotated for 7 discrete expressions plus valence
+   and arousal (abstract). The 8-class setup used by HSEmotion = neutral +
+   7 expressions incl. contempt.
+
+ VGAF (Video level Group AFfect)  (reported for hsemotion_b0)
+   https://ieeexplore.ieee.org/document/8925231  (link from HSEmotion README)
+
+ FER2013  (used by: vit_fer)
+   Goodfellow et al. 2013, https://arxiv.org/abs/1307.0414
+   35887 internet face images, 48x48 grayscale, 7 categories.
+
+ FER+  (initialisation of cmet_mead / cmet_crema)
+   Barsoum et al., ICMI 2016, https://arxiv.org/abs/1608.01041
+   FER images re-labelled by 10 taggers each.  https://github.com/microsoft/FERPlus
+
+ MEAD  (fine-tuning of cmet_mead; C-MET evaluation)
+   Wang et al., ECCV 2020,
+   https://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123660698.pdf
+   https://github.com/uniBruce/Mead
+   60 actors, 8 emotions x 3 intensities, 7 camera views, studio.
+   (The old project page wywu.github.io/projects/MEAD/MEAD.html now 404s.)
+
+ CREMA-D  (fine-tuning of cmet_crema)
+   Cao et al., IEEE TAC 2014, DOI 10.1109/TAFFC.2014.2336244
+   https://github.com/CheyneyComputerScience/CREMA-D
+   7,442 clips, 91 actors, 6 emotions; licence ODbL 1.0 / DbCL 1.0.
+
+ Seamless Interaction  (our "seamless" clips; seamless_imitator)
+   Agrawal et al. (Meta) 2025, https://arxiv.org/abs/2506.22554
+   >4,000 hours of face-to-face interaction, >4,000 participants;
+   original video 30/29.97 fps 1080p, audio 48 kHz (README). Our bucket's
+   processed copy is 25 fps (its timing table). Licence CC-BY-NC 4.0.
+
+ talkvid, dataset_clip  (our gold clips)
+   Internal Lance datasets in r2:fullbodydataset. talkvid: 90,329 clips,
+   all with audio, 25 fps. dataset_clip: 5.1M clips in its storage table,
+   ~61% with audio, ~24.7-24.9 fps.
+
+===============================================================================
+ 6. CHEAT-SHEET
+===============================================================================
+ name                looks at  #classes  neutral?  trained on          F1 (42 / 53)
+ ------------------  --------  --------  --------  ------------------  ------------
+ vit_fer             face      7         yes       FER2013             0.667/0.385
+ hsemotion_b0        face      8         yes       AffectNet           0.546/0.467
+ speech_emotion2vec  voice     7 (+2*)   yes       pseudo-labelled     0.494/0.190
+                                                   speech 42.5k h
+ hsemotion_b2        face      8         yes       AffectNet           0.398/0.359
+ cmet_mead           face      7         NO        FER+ -> MEAD        0.292/0.179
+ cmet_crema          face      5         NO        FER+ -> CREMA-D     0.118/0.247
+ seamless_imitator   face**    8         yes       unknown (Meta)      n/a (no gold)
+ ensemble_mean       all       -         -         -                   0.636/0.559
+
+  F1 = macro-F1 on 42 medium+high gold clips / all 53 gold clips.
+  *  "other" and "unknown" dropped.   ** precomputed by Meta; input unknown.
+  No model is a clear winner yet: confidence intervals overlap and the gold
+  labels are mostly neutral/happy (sad 4, surprised 1, disgusted 1).
+
+===============================================================================
+ 7. SUGGESTED READING ORDER + GLOSSARY
+===============================================================================
+ Reading order
+   1. ResNet (1512.03385) and ViT (2010.11929): the two backbone ideas.
+   2. AffectNet (1708.03985) and FER2013 (1307.0414): what "emotion
+      labels" in images mean and how noisy they are; FER+ (1608.01041) for
+      why label distributions help.
+   3. HSEmotion (2103.17107): practical face-emotion models.
+   4. emotion2vec (2312.15185): emotion from the voice.
+   5. MEAD (ECCV 2020) and CREMA-D (TAC 2014): acted-emotion datasets.
+   6. C-MET (2604.07786) and NED (2112.00585): editing emotion in video;
+      read how each EVALUATES emotion accuracy.
+   7. Seamless Interaction (2506.22554): conversational data, speaking vs
+      listening.
+
+ Glossary
+   Backbone     the main network that turns an image into features
+                (EfficientNet, ResNet, ViT).
+   Logit        raw class score before softmax.
+   Softmax      turns logits into probabilities that sum to 1.
+   Fine-tuning  continuing to train a pre-trained model on new data.
+   Pseudo-label a label produced by a model rather than a person.
+   dBFS         loudness relative to digital full scale (0 = max);
+                -55 dBFS is very quiet.
+   Landmarks    68 points on the face (jaw, brows, eyes, nose, mouth).
+   Face chip    dlib's aligned, cropped face image (eyes level, fixed size).
+   Macro-F1 / ECE / kappa / flip rate: see 1.5.

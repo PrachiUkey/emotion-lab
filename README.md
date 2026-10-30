@@ -300,7 +300,8 @@ On the 42 medium/high-confidence labels (28 neutral, 14 happy):
 - **C-MET's classifiers are weak on this footage even on emotional clips** (trained on studio actors: MEAD,
   CREMA-D). `cmet_crema` often reads smiles as angry or sad.
 - **Voice vs face:** the voice model invents the fewest emotions on calm clips but misses most happy faces —
-  many people who *look* happy *sound* neutral. Face and voice agree on only ~30% of Seamless clips.
+  many people who *look* happy *sound* neutral. On Seamless clips with speech, face and voice agree on only
+  15–36% of clips.
 - **Silence:** emotion2vec calls near-silent audio "sad", so quiet stretches get no voice prediction
   (Seamless "listening" clips mostly have none).
 - Next: ~500 labels covering every emotion (incl. Seamless clips), then pick a model or a face+voice ensemble.
@@ -327,6 +328,7 @@ On the 42 medium/high-confidence labels (28 neutral, 14 happy):
 ```
 emotion-lab/
 ├── setup.sh                 one-command setup / --check
+├── docs/MODELS.txt          study guide: every model, its papers, data, classes, how we run it, results
 ├── emotion_lab/             Python package
 │   ├── data.py              read clips from the R2 Lance datasets, face boxes from landmarks
 │   ├── models/              model plug-ins (HSEmotion, Hugging Face, …) + registry
