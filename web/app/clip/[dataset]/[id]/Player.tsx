@@ -97,7 +97,8 @@ export default function Player({ doc, video, gold }: { doc: PredsDoc; video: str
   const probs = doc.frames[barModel]?.[frame];
   const can = new Set(classesOf(barModel));
   const t = (frame + 0.5) / doc.fps;
-  const words = (doc.transcript ?? []).filter((w) => w.end >= t - 2.5 && w.start <= t + 2.5);
+  const clipEnd = doc.n_frames / doc.fps;  // transcripts can run past the clip; never show words after it ends
+  const words = (doc.transcript ?? []).filter((w) => w.start < clipEnd && w.end >= t - 2.5 && w.start <= t + 2.5);
   const fpsAssumed = doc.fps_source !== 'dataset';
   const badge = (m: string) => (
     <>
@@ -110,8 +111,11 @@ export default function Player({ doc, video, gold }: { doc: PredsDoc; video: str
     <div className="player">
       <div>
         <div className="stage">
-          <video ref={videoRef} src={video} controls playsInline preload="auto" />
-          <canvas ref={canvasRef} />
+          {/* the overlay canvas sits exactly on the video box, so portrait clips can be height-capped */}
+          <div className="frame">
+            <video ref={videoRef} src={video} controls playsInline preload="auto" />
+            <canvas ref={canvasRef} />
+          </div>
         </div>
         {doc.transcript && doc.transcript.length > 0 && (
           <div className="caption">

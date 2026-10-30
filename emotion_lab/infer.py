@@ -41,7 +41,9 @@ def predict_clip(clip, models, existing=None):
                        'n_frames': len(clip.rows), 'width': clip.rows[0]['frame_width'],
                        'height': clip.rows[0]['frame_height'], 'labels': CANONICAL, 'boxes': boxes,
                        'frames': {}, 'clip': {}}
-    doc['fps'], doc['fps_source'], doc['transcript'] = clip.fps, clip.fps_source, clip.transcript
+    doc['fps'], doc['fps_source'] = clip.fps, clip.fps_source
+    if clip.transcript or 'transcript' not in doc:  # keep a stored transcript if this run didn't fetch one
+        doc['transcript'] = clip.transcript
     doc['warnings'] = clip.warnings
     doc.setdefault('model_meta', {})
     todo = [m for m in models if m.name not in doc['clip'] and (not m.datasets or clip.dataset in m.datasets)]
@@ -73,8 +75,8 @@ def predict_clip(clip, models, existing=None):
             if clip_probs is not None:
                 clip_override[m.name] = clip_probs
         for m in todo:
-            if m.input == 'audio' and wav is None:
-                continue  # leave absent rather than show an empty prediction
+            if m.input == 'audio' and m.name not in clip_override:
+                continue  # no audio / no speech: leave absent rather than show a made-up prediction
             doc['frames'][m.name] = [None if p is None else [round(float(v), 4) for v in p] for p in per_frame[m.name]]
             doc['clip'][m.name] = _summary(per_frame[m.name])
             if m.name in clip_override:  # audio: one pass over the whole clip beats averaging windows

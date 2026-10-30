@@ -35,7 +35,7 @@ def main():
             missing.append(k)
     if missing:
         print(f'!!! {len(missing)} gold clips have no predictions (run scripts/run_models.py): {missing[:5]}...')
-    models = args.models.split(',') if args.models else sorted(set.intersection(*(set(p['clip']) for p in preds.values())))
+    models = args.models.split(',') if args.models else sorted(set.union(*(set(p['clip']) for p in preds.values())))
 
     res = evaluate(gold, preds, models)
     res['gold_file'], res['min_confidence'] = args.gold, args.min_confidence
@@ -48,7 +48,7 @@ def main():
     print(f"{'model':16s} {'macroF1':>8s} {'95% CI':>15s} {'acc':>6s} {'neutralFP':>9s} {'ECE':>6s} {'flip':>6s}")
     for r in res['leaderboard']:
         ci = f"[{r['macro_f1_ci95'][0]:.2f},{r['macro_f1_ci95'][1]:.2f}]"
-        print(f"{r['model']:16s} {r['macro_f1']:8.3f} {ci:>15s} {r['accuracy']:6.2f} {r['neutral_fp_rate']:9.2f} "
+        print(f"{r['model']:19s} n={r['n']:<3d} {r['macro_f1']:8.3f} {ci:>15s} {r['accuracy']:6.2f} {r['neutral_fp_rate']:9.2f} "
               f"{r['ece']:6.3f} {r['flip_rate']:6.3f}  recall={r['recall']}")
     print('agreement:', res['agreement'])
 

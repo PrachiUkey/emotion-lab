@@ -38,14 +38,15 @@ def fleiss_kappa(label_matrix, n_classes):
 
 
 def evaluate(gold, preds, models, n_boot=1000, seed=0):
-    """gold: {key: label}; preds: {key: preds-doc}; models: names. Returns the leaderboard dict."""
-    keys = [k for k in gold if k in preds and all(m in preds[k]['clip'] for m in models)]
-    y = np.array([CANONICAL.index(gold[k]) for k in keys])
-    present = sorted(set(y.tolist()))
-    rng = np.random.default_rng(seed)
-    boots = [rng.integers(0, len(keys), len(keys)) for _ in range(n_boot)]
+    """gold: {key: label}; preds: {key: preds-doc}; models: names. Returns the leaderboard dict.
 
-    def probs_for(name):
+    Each model is scored on the gold clips where it produced a verdict (a voice model gives none on silent clips),
+    so `n` can differ per model; the ensemble uses clips where every model has one."""
+    has = {m: [k for k in gold if k in preds and m in preds[k]['clip']] for m in models}
+    common = [k for k in gold if k in preds and all(m in preds[k]['clip'] for m in models)]
+    rng = np.random.default_rng(seed)
+
+    def probs_for(name, keys):
         if name == 'ensemble_mean':
             return np.mean([[preds[k]['clip'][m]['probs'] for k in keys] for m in models], 0)
         return np.array([preds[k]['clip'][name]['probs'] for k in keys])
@@ -53,12 +54,22 @@ def evaluate(gold, preds, models, n_boot=1000, seed=0):
     def frames_for(name, k):
         if name == 'ensemble_mean':
             per = [preds[k]['frames'][m] for m in models]
-            return [None if f[0] is None else np.mean(f, 0) for f in zip(*per)]
+            out = []
+            for f in zip(*per):
+                vals = [v for v in f if v is not None]
+                out.append(np.mean(vals, 0) if vals else None)
+            return out
         return preds[k]['frames'][name]
 
     rows = []
     for name in list(models) + (['ensemble_mean'] if len(models) > 1 else []):
-        P = probs_for(name)
+        keys = common if name == 'ensemble_mean' else has[name]
+        if not keys:
+            continue
+        y = np.array([CANONICAL.index(gold[k]) for k in keys])
+        present = sorted(set(y.tolist()))
+        boots = [rng.integers(0, len(keys), len(keys)) for _ in range(n_boot)]
+        P = probs_for(name, keys)
         pred = P.argmax(1)
         f1 = f1_score(y, pred, labels=present, average='macro', zero_division=0)
         f1_boot = [f1_score(y[b], pred[b], labels=present, average='macro', zero_division=0) for b in boots]
@@ -85,11 +96,19 @@ def evaluate(gold, preds, models, n_boot=1000, seed=0):
         })
     rows.sort(key=lambda r: -r['macro_f1'])
 
-    labels = {m: np.array([CANONICAL.index(preds[k]['clip'][m]['label']) for k in keys]) for m in models}
-    pairwise = {f'{a}|{b}': round(float(cohen_kappa_score(labels[a], labels[b])), 4)
-                for a, b in combinations(models, 2)}
-    return {'n_clips': len(keys), 'labels': CANONICAL, 'gold_distribution':
-            {CANONICAL[c]: int((y == c).sum()) for c in present}, 'leaderboard': rows,
+    def lab(m, keys):
+        return np.array([CANONICAL.index(preds[k]['clip'][m]['label']) for k in keys])
+
+    pairwise = {}
+    for a, b in combinations(models, 2):
+        keys = [k for k in has[a] if k in set(has[b])]
+        if keys:
+            pairwise[f'{a}|{b}'] = round(float(cohen_kappa_score(lab(a, keys), lab(b, keys))), 4)
+    all_keys = [k for k in gold if k in preds]
+    y_all = np.array([CANONICAL.index(gold[k]) for k in all_keys])
+    return {'n_clips': len(all_keys), 'labels': CANONICAL,
+            'gold_distribution': {CANONICAL[c]: int((y_all == c).sum()) for c in sorted(set(y_all.tolist()))},
+            'leaderboard': rows,
             'agreement': {'cohen_kappa': pairwise,
-                          'fleiss_kappa': round(fleiss_kappa(np.stack([labels[m] for m in models], 1),
-                                                             len(CANONICAL)), 4) if len(models) > 1 else None}}
+                          'fleiss_kappa': round(fleiss_kappa(np.stack([lab(m, common) for m in models], 1),
+                                                             len(CANONICAL)), 4) if len(models) > 1 and common else None}}

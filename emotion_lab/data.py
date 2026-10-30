@@ -137,15 +137,20 @@ def prefetch_transcripts(dataset, clip_ids):
     return len(rows)
 
 
-def _transcript(dataset, clip_id, clip_start):
-    """Word timings (clip-relative seconds) if prefetched, else [] — never a slow per-clip scan."""
+def _transcript(dataset, clip_id, clip_start, duration):
+    """Word timings (clip-relative seconds) if prefetched, else [] — never a slow per-clip scan. The dataset's
+    transcript covers the whole utterance, which can run past the clip; only words inside the clip are kept."""
     raw = _TRANSCRIPTS.get((dataset, clip_id))
     if not raw:
         return []
     words = []
     for seg in json.loads(raw):
         for w in seg.get('words', []):
-            words.append({'word': w['word'], 'start': round(w['start'] - clip_start, 3), 'end': round(w['end'] - clip_start, 3)})
+            if w.get('start') is None or w.get('end') is None:
+                continue  # some ASR words carry no timing; they can't be placed on the timeline
+            start, end = w['start'] - clip_start, w['end'] - clip_start
+            if end > 0 and start < duration:
+                words.append({'word': w['word'], 'start': round(start, 3), 'end': round(end, 3)})
     return words
 
 
@@ -178,6 +183,6 @@ def load_clip(dataset, clip_id, fragment):
             print(f'!!! {dataset}/{clip_id}: {clip.warnings[-1]}', flush=True)
         clip.fps, clip.fps_source = float(t['fps']), 'dataset'
         if t.get('start_seconds') is not None:
-            clip.transcript = _transcript(dataset, clip_id, t['start_seconds'])
+            clip.transcript = _transcript(dataset, clip_id, t['start_seconds'], len(rows) / clip.fps)
     clip.has_audio = audio_key(dataset, clip_id) is not None
     return clip

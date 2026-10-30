@@ -27,6 +27,8 @@ def main():
     ap.add_argument('--store', default=None, help='local:<dir> or r2:<bucket>/<prefix> (default $EMOTION_LAB_STORE)')
     ap.add_argument('--limit', type=int, default=None)
     ap.add_argument('--reencode', action='store_true', help='rebuild mp4s (e.g. to add audio / real fps)')
+    ap.add_argument('--recompute', action='store_true', help='recompute --models even if already in the preds')
+    ap.add_argument('--skip-transcripts', action='store_true', help='skip the (slow) transcript fetch; stored ones are kept')
     args = ap.parse_args()
 
     store = open_store(args.store)
@@ -35,7 +37,7 @@ def main():
     index = {f"{e['dataset']}/{e['clip_id']}": e for e in (get_json(store, 'index.json')
                                                            if store.exists('index.json') else [])}
     print(f'store={store} models={[m.name for m in models]} clips={len(rows)}', flush=True)
-    for ds_name in sorted({r['dataset'] for r in rows}):
+    for ds_name in [] if args.skip_transcripts else sorted({r['dataset'] for r in rows}):
         t = time.time()
         n = prefetch_transcripts(ds_name, [r['clip_id'] for r in rows if r['dataset'] == ds_name])
         if n:
@@ -48,7 +50,12 @@ def main():
         try:
             clip = load_clip(row['dataset'], row['clip_id'], int(row['fragment']))
             pkey = f'preds/{key}.json'
-            doc = predict_clip(clip, models, get_json(store, pkey) if store.exists(pkey) else None)
+            existing = get_json(store, pkey) if store.exists(pkey) else None
+            if existing and args.recompute:
+                for m in models:
+                    existing['clip'].pop(m.name, None)
+                    existing['frames'].pop(m.name, None)
+            doc = predict_clip(clip, models, existing)
             put_json(store, pkey, doc)
             if args.reencode or not store.exists(f'clips/{key}.mp4'):
                 store.put_bytes(f'clips/{key}.mp4', encode_mp4(clip), 'video/mp4')

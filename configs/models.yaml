@@ -44,5 +44,7 @@ models:
     repo: emotion2vec/emotion2vec_plus_large
     window: 2.0   # seconds of speech scored at a time
     hop: 0.5
+    silence_db: -55   # quieter windows get no prediction (the model calls silence "sad")
+    min_voiced: 0.2   # fewer sounding windows than this -> no whole-clip verdict
     trained_on: emotion2vec+ large - speech emotion from audio (the encoder C-MET uses); 7 emotions, no contempt
     license: see model card

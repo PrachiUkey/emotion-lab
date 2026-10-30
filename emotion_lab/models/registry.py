@@ -19,8 +19,8 @@ def _build(name, spec):
         model = CMetEmotionFAN(name, spec['variant'], spec['checkpoint'])
     elif kind == 'audio_emotion2vec':
         from emotion_lab.models.audio_emotion2vec import Emotion2Vec
-        model = Emotion2Vec(name, spec.get('repo', 'emotion2vec/emotion2vec_plus_large'),
-                            spec.get('window', 2.0), spec.get('hop', 0.5))
+        model = Emotion2Vec(name, spec.get('repo', 'emotion2vec/emotion2vec_plus_large'), spec.get('window', 2.0),
+                            spec.get('hop', 0.5), spec.get('silence_db', -55.0), spec.get('min_voiced', 0.2))
     elif kind == 'dataset_column':
         from emotion_lab.models.dataset_column import DatasetColumn
         model = DatasetColumn(name, spec['column'], spec['labels'], spec['datasets'], spec.get('logits', True))
