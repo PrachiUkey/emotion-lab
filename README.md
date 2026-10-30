@@ -279,18 +279,27 @@ Videos are served with 15-minute signed links, so the bucket stays private. New 
 
 ## Current results
 
-53 human-labelled clips (labels by visual inspection, clip level). On the 42 medium/high-confidence labels:
+53 human-labelled clips (labels by visual inspection, clip level, from `talkvid` + `dataset_clip`, all with audio).
+On the 42 medium/high-confidence labels (28 neutral, 14 happy):
 
-| Model | Trained on | Macro-F1 (95% CI) | Calls neutral faces emotional |
-|---|---|---|---|
-| `vit_fer` | FER2013 | 0.67 (0.49–0.81) | 43% |
-| ensemble (mean) | — | 0.66 (0.50–0.80) | 43% |
-| `hsemotion_b0` | AffectNet / VGAF | 0.55 (0.39–0.69) | 75% |
-| `hsemotion_b2` | AffectNet | 0.40 (0.21–0.54) | 86% |
+| Model | Looks at | Macro-F1 (95% CI) | On emotional clips only | Calls neutral clips emotional |
+|---|---|---|---|---|
+| `vit_fer` | face | **0.67** (0.51–0.81) | 0.83 | 43% |
+| ensemble (mean of all) | both | 0.64 (0.48–0.77) | 0.88 | 54% |
+| `hsemotion_b0` | face | 0.55 (0.39–0.69) | 0.78 | 75% |
+| `speech_emotion2vec` | voice | 0.49 | 0.53 | **39%** |
+| `hsemotion_b2` | face | 0.40 (0.21–0.54) | 0.60 | 86% |
+| `cmet_mead` | face | 0.29 | 0.67 | 100% (has no neutral) |
+| `cmet_crema` | face | 0.12 | 0.25 | 100% (has no neutral) |
 
-**No clear winner yet.** The confidence ranges overlap, and the labels are almost all neutral or happy
-(sad 4, surprised 1, disgusted 1). Every model confuses talking mouths with emotions. Next steps:
-~500 labels covering every emotion, and models that are less fooled by speech.
+- **No clear winner yet** — the ranges overlap and the labels are almost all neutral or happy.
+- **C-MET's classifiers are weak on this footage even on emotional clips** (trained on studio actors: MEAD,
+  CREMA-D). `cmet_crema` often reads smiles as angry or sad.
+- **Voice vs face:** the voice model invents the fewest emotions on calm clips but misses most happy faces —
+  many people who *look* happy *sound* neutral. Face and voice agree on only ~30% of Seamless clips.
+- **Silence:** emotion2vec calls near-silent audio "sad", so quiet stretches get no voice prediction
+  (Seamless "listening" clips mostly have none).
+- Next: ~500 labels covering every emotion (incl. Seamless clips), then pick a model or a face+voice ensemble.
 
 ---
 
