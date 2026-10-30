@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { modelInfo, TERMS } from '@/lib/glossary';
 import { EMOTION_COLORS, type Gold, type PredsDoc } from '@/lib/types';
 import Tip from '../../../Tip';
+import FrameView from './FrameView';
 
 type VideoWithRVFC = HTMLVideoElement & {
   requestVideoFrameCallback?: (cb: (now: number, meta: { mediaTime: number }) => void) => number;
@@ -20,7 +21,7 @@ function label(ctx: CanvasRenderingContext2D, text: string, color: string, x: nu
   ctx.fillStyle = '#fff'; ctx.fillText(text, x + 5, y + 14);
 }
 
-export default function Player({ doc, video, gold }: { doc: PredsDoc; video: string; gold?: Gold[string] }) {
+export default function Player({ doc, video, sprite, gold }: { doc: PredsDoc; video: string; sprite?: string; gold?: Gold[string] }) {
   const meta = doc.model_meta ?? {};
   const isAudio = (m: string) => meta[m]?.modality === 'audio';
   const classesOf = (m: string) => meta[m]?.classes ?? doc.labels;
@@ -108,6 +109,7 @@ export default function Player({ doc, video, gold }: { doc: PredsDoc; video: str
   );
 
   return (
+    <>
     <div className="player">
       <div>
         <div className="stage">
@@ -216,5 +218,7 @@ export default function Player({ doc, video, gold }: { doc: PredsDoc; video: str
         </div>
       </aside>
     </div>
+    <FrameView doc={doc} models={models} frame={frame} sprite={sprite} onSeek={seek} badge={badge} />
+    </>
   );
 }

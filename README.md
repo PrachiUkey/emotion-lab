@@ -134,6 +134,10 @@ Manage the service with `supervisorctl status|restart emotion-lab-web`.
 - **Clip page** — the video with a face box and `emotion confidence` drawn on every frame.
   Switch between models (or show all), see the current frame's probability for each emotion,
   and a timeline strip per model — click it to jump to that moment.
+- **Frame by frame** (under the video) — every model's full emotion breakdown for the current frame side by side,
+  and a grid with one row per model and one column per frame (with thumbnails): each cell shows the model's emotion
+  and confidence for that frame. Hover for all scores, click to jump there, choose every frame / every Nth frame,
+  and **Download CSV** for every frame × model.
 - **Leaderboard** — how each model scores against the human labels.
 
 ---

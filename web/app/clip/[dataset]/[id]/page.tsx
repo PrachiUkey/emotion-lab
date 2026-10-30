@@ -10,13 +10,13 @@ export default async function ClipPage({ params }: { params: { dataset: string; 
   if (!isSafeKey(key)) notFound();
   const [doc, gold] = await Promise.all([getJson<PredsDoc>(`preds/${key}.json`), getJson<Gold>('gold/labels.json')]);
   if (!doc) notFound();
-  const video = await mediaUrl(`clips/${key}.mp4`);
+  const [video, sprite] = await Promise.all([mediaUrl(`clips/${key}.mp4`), mediaUrl(`sprites/${key}.jpg`)]);
   return (
     <main>
       <h2 style={{ margin: '0 0 12px', fontSize: 16, wordBreak: 'break-all' }}>
         {doc.dataset} · {doc.clip_id}
       </h2>
-      <Player doc={doc} video={video} gold={gold?.[key]} />
+      <Player doc={doc} video={video} sprite={doc.sprite ? sprite : undefined} gold={gold?.[key]} />
     </main>
   );
 }

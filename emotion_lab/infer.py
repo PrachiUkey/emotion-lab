@@ -135,3 +135,22 @@ def thumbnail(clip, height=180):
     h, w = img.shape[:2]
     img = cv2.resize(img, (int(w * height / h), height))
     return cv2.imencode('.jpg', img, [cv2.IMWRITE_JPEG_QUALITY, 80])[1].tobytes()
+
+
+def frame_sprite(clip, height=72, max_frames=1000, cols=20):
+    """All frames (every `step`-th if the clip is long) as small tiles in one JPEG, for frame-by-frame thumbnails.
+    Returns (jpeg bytes, meta) where meta = {step, cols, tile_w, tile_h, count}."""
+    n = len(clip.rows)
+    step = max(1, -(-n // max_frames))
+    idx = list(range(0, n, step))
+    first = cv2.imdecode(np.frombuffer(clip.rows[0]['jpeg'], np.uint8), cv2.IMREAD_COLOR)
+    tile_h = height
+    tile_w = int(round(first.shape[1] * height / first.shape[0])) // 2 * 2
+    rows = -(-len(idx) // cols)
+    sheet = np.zeros((rows * tile_h, cols * tile_w, 3), np.uint8)
+    for k, i in enumerate(idx):
+        img = cv2.imdecode(np.frombuffer(clip.rows[i]['jpeg'], np.uint8), cv2.IMREAD_REDUCED_COLOR_4)
+        r, c = divmod(k, cols)
+        sheet[r * tile_h:(r + 1) * tile_h, c * tile_w:(c + 1) * tile_w] = cv2.resize(img, (tile_w, tile_h), interpolation=cv2.INTER_AREA)
+    jpeg = cv2.imencode('.jpg', sheet, [cv2.IMWRITE_JPEG_QUALITY, 70])[1].tobytes()
+    return jpeg, {'step': step, 'cols': cols, 'tile_w': tile_w, 'tile_h': tile_h, 'count': len(idx)}

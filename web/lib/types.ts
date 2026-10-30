@@ -30,7 +30,10 @@ export type PredsDoc = {
   transcript?: Word[];
   warnings?: string[];
   model_meta?: Record<string, ModelMeta>;
+  sprite?: SpriteMeta;
 };
+
+export type SpriteMeta = { step: number; cols: number; tile_w: number; tile_h: number; count: number };
 
 export type Gold = Record<string, { emotion: string; confidence?: string; annotator?: string; notes?: string }>;
 

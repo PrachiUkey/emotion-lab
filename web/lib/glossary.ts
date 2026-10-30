@@ -65,6 +65,11 @@ export const TERMS = {
     'hears that emotion; the bars add up to 1.',
   cannotSay: 'This model was never taught this emotion, so it can never answer it. Compare such models on the ' +
     'emotions they know (see "non-neutral" score on the leaderboard).',
+  thisFrameAll: 'Every model\'s answer for the frame on screen, side by side. Each coloured bar is one model\'s full ' +
+    'breakdown: the wider a colour, the more strongly it sees that emotion. The chip on the right is its top pick.',
+  frameGrid: 'One row per model, one column per frame (thumbnails on top). Each cell shows the model\'s top emotion ' +
+    '(3-letter code) and how sure it is; stronger colour = more sure. Hover a cell for all scores, click to jump ' +
+    'the video there. "—" means no face (or no sound, for voice models) in that frame.',
   dataWarning: 'A small mismatch in the source data for this clip (for example one frame more than the dataset\'s ' +
     'timing table says). The clip is still shown; numbers may be off by one frame.',
 };

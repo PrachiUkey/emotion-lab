@@ -15,7 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from emotion_lab.data import load_clip, prefetch_transcripts  # noqa: E402
-from emotion_lab.infer import encode_mp4, predict_clip, thumbnail  # noqa: E402
+from emotion_lab.infer import encode_mp4, frame_sprite, predict_clip, thumbnail  # noqa: E402
 from emotion_lab.models.registry import load_models  # noqa: E402
 from emotion_lab.store import get_json, open_store, put_json  # noqa: E402
 
@@ -56,6 +56,9 @@ def main():
                     existing['clip'].pop(m.name, None)
                     existing['frames'].pop(m.name, None)
             doc = predict_clip(clip, models, existing)
+            if 'sprite' not in doc or not store.exists(f'sprites/{key}.jpg'):
+                jpg, doc['sprite'] = frame_sprite(clip)  # thumbnails for the frame-by-frame grid
+                store.put_bytes(f'sprites/{key}.jpg', jpg, 'image/jpeg')
             put_json(store, pkey, doc)
             if args.reencode or not store.exists(f'clips/{key}.mp4'):
                 store.put_bytes(f'clips/{key}.mp4', encode_mp4(clip), 'video/mp4')
